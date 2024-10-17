@@ -23,7 +23,7 @@ save-dev-data:
 	supabase db pull --schema auth,storage --local
 
 load-dev-data:
-	supabase migration up
+	supabase migration up --local
 
 dev-stop:
 	supabase stop
