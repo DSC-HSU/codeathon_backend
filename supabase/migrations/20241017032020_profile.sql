@@ -129,11 +129,6 @@ CREATE POLICY "Users can update own profile." ON "public"."profiles" FOR UPDATE 
 ALTER TABLE "public"."profiles" ENABLE ROW LEVEL SECURITY;
 
 
-CREATE PUBLICATION "logflare_pub" WITH (publish = 'insert, update, delete, truncate');
-
-
-ALTER PUBLICATION "logflare_pub" OWNER TO "supabase_admin";
-
 
 
 
