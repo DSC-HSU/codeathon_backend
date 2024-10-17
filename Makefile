@@ -1,3 +1,6 @@
+colon := :
+$(colon) := :
+
 prepare:
 	@echo "Please install the following dependencies:"
 	@echo "1. Install supabase cli:"
@@ -8,6 +11,10 @@ prepare:
 	@echo "        https://github.com/swaggo/gin-swagger"
 	@echo "If you have installed all the dependencies, just wait for the supabase spin up and run dev-start"
 	supabase start
+
+start-rabbitmq:
+	docker run -it --rm --name rabbitmq -p 5672$(:)5672 -p 15672$(:)15672 rabbitmq$(:)4.0-management
+
 dev-start:
 	weaver generate ./...
 	go run ./cmd/server
@@ -20,3 +27,4 @@ load-dev-data:
 
 dev-stop:
 	supabase stop
+
