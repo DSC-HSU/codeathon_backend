@@ -46,11 +46,20 @@ func (p profileService) List(ctx context.Context, opts *domain.ListOpts) ([]*dom
 }
 
 func (p profileService) Update(ctx context.Context, profile *domain.Profile) error {
-	_, _, err := supabase.Client.From("profiles").Update(profile, "", "").Eq("id", profile.Id).Execute()
+	_, err := p.GetById(ctx, profile.Id)
+	if err != nil {
+		return err
+	}
+
+	_, _, err = supabase.Client.From("profiles").Update(profile, "", "").Eq("id", profile.Id).Execute()
 	return err
 }
 
 func (p profileService) Delete(ctx context.Context, id string) error {
-	_, _, err := supabase.Client.From("profiles").Delete("", "").Eq("id", id).Execute()
+	_, err := p.GetById(ctx, id)
+	if err != nil {
+		return err
+	}
+	_, _, err = supabase.Client.From("profiles").Delete("", "").Eq("id", id).Execute()
 	return err
 }
