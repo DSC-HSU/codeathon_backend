@@ -1,6 +1,6 @@
 package domain
 
-type Quest struct {
+type Challenge struct {
 	Id            string   `json:"id"`
 	Title         string   `json:"title"`
 	Description   string   `json:"description"`
