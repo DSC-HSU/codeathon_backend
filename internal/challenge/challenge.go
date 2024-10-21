@@ -2,6 +2,7 @@ package challenge
 
 import (
 	"codeathon.runwayclub.dev/domain"
+	"codeathon.runwayclub.dev/internal/submission"
 	"codeathon.runwayclub.dev/internal/supabase"
 	"context"
 	"encoding/json"
@@ -9,20 +10,22 @@ import (
 	"fmt"
 	"github.com/ServiceWeaver/weaver"
 	v8 "rogchap.com/v8go"
+	"strconv"
 	"time"
 )
 
 type ChallengeService interface {
 	GetById(ctx context.Context, id string) (*domain.Challenge, error)
 	Create(ctx context.Context, challenge *domain.Challenge) error
-	List(ctx context.Context, opts *domain.ListOpts) ([]*domain.Challenge, error)
+	List(ctx context.Context, opts *domain.ListOpts) (*domain.ListResult[*domain.Challenge], error)
 	Update(ctx context.Context, challenge *domain.Challenge) error
 	Delete(ctx context.Context, id string) error
-	Scoring(ctx context.Context, submission *domain.Submission, data string) (*domain.SubmitResult, error)
+	Scoring(ctx context.Context, submission *domain.Submission, data string, userId string, challengeId string) (*domain.SubmitResult, error)
 }
 
 type challengeService struct {
 	weaver.Implements[ChallengeService]
+	submissionService weaver.Ref[submission.SubmissionService]
 }
 
 func (c challengeService) GetById(ctx context.Context, id string) (*domain.Challenge, error) {
@@ -43,7 +46,7 @@ func (c challengeService) Create(ctx context.Context, challenge *domain.Challeng
 	return err
 }
 
-func (c challengeService) List(ctx context.Context, opts *domain.ListOpts) ([]*domain.Challenge, error) {
+func (c challengeService) List(ctx context.Context, opts *domain.ListOpts) (*domain.ListResult[*domain.Challenge], error) {
 	data, _, err := supabase.Client.From("challenges").Select("*", "", false).Range(opts.Offset, opts.Offset+opts.Limit, "").Execute()
 	if err != nil {
 		return nil, err
@@ -53,7 +56,26 @@ func (c challengeService) List(ctx context.Context, opts *domain.ListOpts) ([]*d
 	if err != nil {
 		return nil, err
 	}
-	return challenges, nil
+
+	//get total page
+	data, _, err = supabase.Client.From("challenges").Select("count(*)", "", false).Execute()
+	if err != nil {
+		return nil, err
+	}
+
+	var total int64
+	err = json.Unmarshal(data, &total)
+	if err != nil {
+		return nil, err
+	}
+
+	//calculate total page
+	totalPage := total / int64(opts.Limit)
+
+	return &domain.ListResult[*domain.Challenge]{
+		TotalPage: totalPage,
+		Data:      challenges,
+	}, nil
 }
 
 func (c challengeService) Update(ctx context.Context, challenge *domain.Challenge) error {
@@ -66,7 +88,7 @@ func (c challengeService) Delete(ctx context.Context, id string) error {
 	return err
 }
 
-func (c challengeService) Scoring(ctx context.Context, submission *domain.Submission, data string) (*domain.SubmitResult, error) {
+func (c challengeService) Scoring(ctx context.Context, submission *domain.Submission, data string, userId string, challengeId string) (*domain.SubmitResult, error) {
 	// Set a timeout of 5 minutes for the script execution
 	ctxWithTimeout, cancel := context.WithTimeout(ctx, 5*time.Minute)
 	defer cancel()
@@ -111,7 +133,7 @@ func (c challengeService) Scoring(ctx context.Context, submission *domain.Submis
 
 		// Return the score as part of the SubmitResult struct
 		result := &domain.SubmitResult{
-			SubmissionId: submission.Id,
+			Id:           strconv.FormatInt(time.Now().UnixMilli(), 10),
 			Score:        score,
 			UserId:       submission.UserId,
 			CreatedAt:    submission.SubmittedAt,
@@ -129,6 +151,34 @@ func (c challengeService) Scoring(ctx context.Context, submission *domain.Submis
 		// If an error occurs in the goroutine, return the error
 		return nil, err
 	case result := <-resultCh:
+
+		//get submission by challengeId and userId
+		foundedSubmission, err := c.submissionService.Get().GetByChallengeIdAndUserId(ctx, userId, challengeId)
+		if err != nil {
+			//if submission not found, create new submission
+			newSubmission := &domain.Submission{
+				ChallengeId:    challengeId,
+				UserId:         userId,
+				Score:          result.Score,
+				SubmittedAt:    time.Now().UnixMilli(),
+				OutputFileUrls: submission.OutputFileUrls,
+			}
+			err = c.submissionService.Get().Create(ctx, newSubmission)
+			if err != nil {
+				return nil, err
+			}
+		}
+
+		//update submission score
+		foundedSubmission.Score = result.Score
+		foundedSubmission.OutputFileUrls = submission.OutputFileUrls
+		foundedSubmission.SubmittedAt = time.Now().UnixMilli()
+
+		err = c.submissionService.Get().Update(ctx, foundedSubmission)
+		if err != nil {
+			return nil, err
+		}
+
 		// If the script finishes successfully, return the result
 		return result, nil
 	}

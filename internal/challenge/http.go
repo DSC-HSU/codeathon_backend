@@ -41,7 +41,7 @@ func Api(service ChallengeService) {
 		c.JSON(200, challenge)
 	})
 
-	r.GET("/challenges", func(c *gin.Context) {
+	r.GET("/challenge/list", func(c *gin.Context) {
 		challenges, err := service.List(c, &domain.ListOpts{})
 		if err != nil {
 			c.JSON(400, gin.H{
@@ -85,7 +85,9 @@ func Api(service ChallengeService) {
 		})
 	})
 
-	r.POST("/challenge/scoring", func(c *gin.Context) {
+	r.POST("/challenge/scoring/:id", func(c *gin.Context) {
+
+		id := c.Param("id")
 		// Extract the file from the request
 		file, err := c.FormFile("scriptFile")
 		if err != nil {
@@ -125,7 +127,7 @@ func Api(service ChallengeService) {
 		}
 
 		// Call the scoring function with the submission and the script content
-		result, err := service.Scoring(c, submission, scriptContent)
+		result, err := service.Scoring(c, submission, scriptContent, id)
 		if err != nil {
 			c.JSON(400, gin.H{
 				"message": err.Error(),
