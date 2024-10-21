@@ -71,7 +71,7 @@ func Api(service ChallengeService) {
 		c.JSON(200, challenge)
 	})
 
-	r.DELETE("/challenge", func(c *gin.Context) {
+	r.DELETE("/challenge/:id", func(c *gin.Context) {
 		id := c.Param("id")
 		err := service.Delete(c, id)
 		if err != nil {
