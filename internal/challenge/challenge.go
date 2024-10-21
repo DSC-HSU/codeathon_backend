@@ -20,7 +20,7 @@ type ChallengeService interface {
 	List(ctx context.Context, opts *domain.ListOpts) (*domain.ListResult[*domain.Challenge], error)
 	Update(ctx context.Context, challenge *domain.Challenge) error
 	Delete(ctx context.Context, id string) error
-	Scoring(ctx context.Context, submission *domain.Submission, data string, userId string, challengeId string) (*domain.SubmitResult, error)
+	Scoring(ctx context.Context, submission *domain.Submission, data string) (*domain.SubmitResult, error)
 }
 
 type challengeService struct {
@@ -88,7 +88,7 @@ func (c challengeService) Delete(ctx context.Context, id string) error {
 	return err
 }
 
-func (c challengeService) Scoring(ctx context.Context, submission *domain.Submission, data string, userId string, challengeId string) (*domain.SubmitResult, error) {
+func (c challengeService) Scoring(ctx context.Context, submission *domain.Submission, data string) (*domain.SubmitResult, error) {
 	// Set a timeout of 5 minutes for the script execution
 	ctxWithTimeout, cancel := context.WithTimeout(ctx, 5*time.Minute)
 	defer cancel()
@@ -153,12 +153,12 @@ func (c challengeService) Scoring(ctx context.Context, submission *domain.Submis
 	case result := <-resultCh:
 
 		//get submission by challengeId and userId
-		foundedSubmission, err := c.submissionService.Get().GetByChallengeIdAndUserId(ctx, userId, challengeId)
+		foundedSubmission, err := c.submissionService.Get().GetByChallengeIdAndUserId(ctx, submission.UserId, submission.ChallengeId)
 		if err != nil {
 			//if submission not found, create new submission
 			newSubmission := &domain.Submission{
-				ChallengeId:    challengeId,
-				UserId:         userId,
+				ChallengeId:    submission.ChallengeId,
+				UserId:         submission.UserId,
 				Score:          result.Score,
 				SubmittedAt:    time.DateTime,
 				OutputFileUrls: submission.OutputFileUrls,
