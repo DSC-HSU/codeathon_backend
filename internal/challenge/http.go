@@ -10,7 +10,7 @@ import (
 func Api(service ChallengeService) {
 	r := endpoint.GetEngine()
 
-	r.GET("/challenge", func(c *gin.Context) {
+	r.GET("/challenge/:id", func(c *gin.Context) {
 		id := c.Param("id")
 		challenge, err := service.GetById(c, id)
 		if err != nil {
