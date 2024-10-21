@@ -10,7 +10,7 @@ type Challenge struct {
 	PhotoUrl      string   `json:"photo_url"`
 	Points        int      `json:"points"`
 	Statement     string   `json:"statement"`
-	CreatedAt     int64    `json:"created_at"`
+	CreatedAt     string   `json:"created_at"`
 	EvalScript    string   `json:"eval_script"`
 	InputFileUrls []string `json:"input_file_urls"`
 }

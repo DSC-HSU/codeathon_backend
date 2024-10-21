@@ -160,7 +160,7 @@ func (c challengeService) Scoring(ctx context.Context, submission *domain.Submis
 				ChallengeId:    challengeId,
 				UserId:         userId,
 				Score:          result.Score,
-				SubmittedAt:    time.Now().UnixMilli(),
+				SubmittedAt:    time.DateTime,
 				OutputFileUrls: submission.OutputFileUrls,
 			}
 			err = c.submissionService.Get().Create(ctx, newSubmission)
@@ -172,7 +172,7 @@ func (c challengeService) Scoring(ctx context.Context, submission *domain.Submis
 		//update submission score
 		foundedSubmission.Score = result.Score
 		foundedSubmission.OutputFileUrls = submission.OutputFileUrls
-		foundedSubmission.SubmittedAt = time.Now().UnixMilli()
+		foundedSubmission.SubmittedAt = time.DateTime
 
 		err = c.submissionService.Get().Update(ctx, foundedSubmission)
 		if err != nil {

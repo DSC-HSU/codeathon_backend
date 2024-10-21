@@ -11,13 +11,13 @@ import (
 )
 
 type Leaderboard struct {
+	weaver.AutoMarshal
 	TotalPage int                  `json:"total_page"`
 	Data      []*domain.Submission `json:"data"`
 }
 
 type LeaderboardService interface {
-	//List(ctx context.Context, opts *domain.ListOpts) (*Leaderboard, error)
-	GetByCId(ctx context.Context, cId string, listOpts *domain.ListOpts) (*domain.Submission, error)
+	GetByCId(ctx context.Context, cId string, listOpts *domain.ListOpts) (*Leaderboard, error)
 	Recalculate(ctx context.Context, cId string) error
 }
 

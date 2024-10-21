@@ -46,6 +46,76 @@ please file an issue at https://github.com/ServiceWeaver/weaver/issues.
 
 // AutoMarshal implementations.
 
+var _ codegen.AutoMarshal = (*Challenge)(nil)
+
+type __is_Challenge[T ~struct {
+	weaver.AutoMarshal
+	Id            string   "json:\"id\""
+	Title         string   "json:\"title\""
+	Description   string   "json:\"description\""
+	PhotoUrl      string   "json:\"photo_url\""
+	Points        int      "json:\"points\""
+	Statement     string   "json:\"statement\""
+	CreatedAt     string   "json:\"created_at\""
+	EvalScript    string   "json:\"eval_script\""
+	InputFileUrls []string "json:\"input_file_urls\""
+}] struct{}
+
+var _ __is_Challenge[Challenge]
+
+func (x *Challenge) WeaverMarshal(enc *codegen.Encoder) {
+	if x == nil {
+		panic(fmt.Errorf("Challenge.WeaverMarshal: nil receiver"))
+	}
+	enc.String(x.Id)
+	enc.String(x.Title)
+	enc.String(x.Description)
+	enc.String(x.PhotoUrl)
+	enc.Int(x.Points)
+	enc.String(x.Statement)
+	enc.String(x.CreatedAt)
+	enc.String(x.EvalScript)
+	serviceweaver_enc_slice_string_4af10117(enc, x.InputFileUrls)
+}
+
+func (x *Challenge) WeaverUnmarshal(dec *codegen.Decoder) {
+	if x == nil {
+		panic(fmt.Errorf("Challenge.WeaverUnmarshal: nil receiver"))
+	}
+	x.Id = dec.String()
+	x.Title = dec.String()
+	x.Description = dec.String()
+	x.PhotoUrl = dec.String()
+	x.Points = dec.Int()
+	x.Statement = dec.String()
+	x.CreatedAt = dec.String()
+	x.EvalScript = dec.String()
+	x.InputFileUrls = serviceweaver_dec_slice_string_4af10117(dec)
+}
+
+func serviceweaver_enc_slice_string_4af10117(enc *codegen.Encoder, arg []string) {
+	if arg == nil {
+		enc.Len(-1)
+		return
+	}
+	enc.Len(len(arg))
+	for i := 0; i < len(arg); i++ {
+		enc.String(arg[i])
+	}
+}
+
+func serviceweaver_dec_slice_string_4af10117(dec *codegen.Decoder) []string {
+	n := dec.Len()
+	if n == -1 {
+		return nil
+	}
+	res := make([]string, n)
+	for i := 0; i < n; i++ {
+		res[i] = dec.String()
+	}
+	return res
+}
+
 var _ codegen.AutoMarshal = (*Config)(nil)
 
 type __is_Config[T ~struct {
@@ -96,6 +166,44 @@ func (x *DefaultAccount) WeaverUnmarshal(dec *codegen.Decoder) {
 	}
 	x.Email = dec.String()
 	x.Password = dec.String()
+}
+
+var _ codegen.AutoMarshal = (*Leaderboard)(nil)
+
+type __is_Leaderboard[T ~struct {
+	weaver.AutoMarshal
+	CId          string "json:\"c_id\""
+	UId          string "json:\"u_id\""
+	Score        int    "json:\"score\""
+	SubmittedAt  string "json:\"submitted_at\""
+	LatestUpdate string "json:\"latest_update\""
+	RankScore    int    "json:\"rank_score\""
+}] struct{}
+
+var _ __is_Leaderboard[Leaderboard]
+
+func (x *Leaderboard) WeaverMarshal(enc *codegen.Encoder) {
+	if x == nil {
+		panic(fmt.Errorf("Leaderboard.WeaverMarshal: nil receiver"))
+	}
+	enc.String(x.CId)
+	enc.String(x.UId)
+	enc.Int(x.Score)
+	enc.String(x.SubmittedAt)
+	enc.String(x.LatestUpdate)
+	enc.Int(x.RankScore)
+}
+
+func (x *Leaderboard) WeaverUnmarshal(dec *codegen.Decoder) {
+	if x == nil {
+		panic(fmt.Errorf("Leaderboard.WeaverUnmarshal: nil receiver"))
+	}
+	x.CId = dec.String()
+	x.UId = dec.String()
+	x.Score = dec.Int()
+	x.SubmittedAt = dec.String()
+	x.LatestUpdate = dec.String()
+	x.RankScore = dec.Int()
 }
 
 var _ codegen.AutoMarshal = (*ListOpts)(nil)
@@ -159,85 +267,16 @@ func (x *Profile) WeaverUnmarshal(dec *codegen.Decoder) {
 	x.LinkedDevPass = dec.String()
 }
 
-var _ codegen.AutoMarshal = (*Quest)(nil)
-
-type __is_Quest[T ~struct {
-	weaver.AutoMarshal
-	Id            string   "json:\"id\""
-	Title         string   "json:\"title\""
-	Description   string   "json:\"description\""
-	PhotoUrl      string   "json:\"photo_url\""
-	Points        int      "json:\"points\""
-	Statement     string   "json:\"statement\""
-	CreatedAt     int64    "json:\"created_at\""
-	EvalScript    string   "json:\"eval_script\""
-	InputFileUrls []string "json:\"input_file_urls\""
-}] struct{}
-
-var _ __is_Quest[Quest]
-
-func (x *Quest) WeaverMarshal(enc *codegen.Encoder) {
-	if x == nil {
-		panic(fmt.Errorf("Quest.WeaverMarshal: nil receiver"))
-	}
-	enc.String(x.Id)
-	enc.String(x.Title)
-	enc.String(x.Description)
-	enc.String(x.PhotoUrl)
-	enc.Int(x.Points)
-	enc.String(x.Statement)
-	enc.Int64(x.CreatedAt)
-	enc.String(x.EvalScript)
-	serviceweaver_enc_slice_string_4af10117(enc, x.InputFileUrls)
-}
-
-func (x *Quest) WeaverUnmarshal(dec *codegen.Decoder) {
-	if x == nil {
-		panic(fmt.Errorf("Quest.WeaverUnmarshal: nil receiver"))
-	}
-	x.Id = dec.String()
-	x.Title = dec.String()
-	x.Description = dec.String()
-	x.PhotoUrl = dec.String()
-	x.Points = dec.Int()
-	x.Statement = dec.String()
-	x.CreatedAt = dec.Int64()
-	x.EvalScript = dec.String()
-	x.InputFileUrls = serviceweaver_dec_slice_string_4af10117(dec)
-}
-
-func serviceweaver_enc_slice_string_4af10117(enc *codegen.Encoder, arg []string) {
-	if arg == nil {
-		enc.Len(-1)
-		return
-	}
-	enc.Len(len(arg))
-	for i := 0; i < len(arg); i++ {
-		enc.String(arg[i])
-	}
-}
-
-func serviceweaver_dec_slice_string_4af10117(dec *codegen.Decoder) []string {
-	n := dec.Len()
-	if n == -1 {
-		return nil
-	}
-	res := make([]string, n)
-	for i := 0; i < n; i++ {
-		res[i] = dec.String()
-	}
-	return res
-}
-
 var _ codegen.AutoMarshal = (*Submission)(nil)
 
 type __is_Submission[T ~struct {
 	weaver.AutoMarshal
-	Id             string   "json:\"id\""
-	QuestId        string   "json:\"quest_id\""
+	ChallengeId    string   "json:\"challenge_id\""
 	UserId         string   "json:\"user_id\""
 	OutputFileUrls []string "json:\"output_file_urls\""
-	SubmittedAt    int64    "json:\"submitted_at\""
+	SubmittedAt    string   "json:\"submitted_at\""
+	Score          float64  "json:\"score\""
+	RankScore      float64  "json:\"rank_score\""
 }] struct{}
 
 var _ __is_Submission[Submission]
@@ -246,22 +285,62 @@ func (x *Submission) WeaverMarshal(enc *codegen.Encoder) {
 	if x == nil {
 		panic(fmt.Errorf("Submission.WeaverMarshal: nil receiver"))
 	}
-	enc.String(x.Id)
-	enc.String(x.QuestId)
+	enc.String(x.ChallengeId)
 	enc.String(x.UserId)
 	serviceweaver_enc_slice_string_4af10117(enc, x.OutputFileUrls)
-	enc.Int64(x.SubmittedAt)
+	enc.String(x.SubmittedAt)
+	enc.Float64(x.Score)
+	enc.Float64(x.RankScore)
 }
 
 func (x *Submission) WeaverUnmarshal(dec *codegen.Decoder) {
 	if x == nil {
 		panic(fmt.Errorf("Submission.WeaverUnmarshal: nil receiver"))
 	}
-	x.Id = dec.String()
-	x.QuestId = dec.String()
+	x.ChallengeId = dec.String()
 	x.UserId = dec.String()
 	x.OutputFileUrls = serviceweaver_dec_slice_string_4af10117(dec)
-	x.SubmittedAt = dec.Int64()
+	x.SubmittedAt = dec.String()
+	x.Score = dec.Float64()
+	x.RankScore = dec.Float64()
+}
+
+var _ codegen.AutoMarshal = (*SubmitResult)(nil)
+
+type __is_SubmitResult[T ~struct {
+	weaver.AutoMarshal
+	Id           string  "json:\"id\""
+	ChallengeId  string  "json:\"challenge_id\""
+	Score        float64 "json:\"score\""
+	UserId       string  "json:\"user_id\""
+	CreatedAt    string  "json:\"created_at\""
+	ErrorMessage string  "json:\"error_message\""
+}] struct{}
+
+var _ __is_SubmitResult[SubmitResult]
+
+func (x *SubmitResult) WeaverMarshal(enc *codegen.Encoder) {
+	if x == nil {
+		panic(fmt.Errorf("SubmitResult.WeaverMarshal: nil receiver"))
+	}
+	enc.String(x.Id)
+	enc.String(x.ChallengeId)
+	enc.Float64(x.Score)
+	enc.String(x.UserId)
+	enc.String(x.CreatedAt)
+	enc.String(x.ErrorMessage)
+}
+
+func (x *SubmitResult) WeaverUnmarshal(dec *codegen.Decoder) {
+	if x == nil {
+		panic(fmt.Errorf("SubmitResult.WeaverUnmarshal: nil receiver"))
+	}
+	x.Id = dec.String()
+	x.ChallengeId = dec.String()
+	x.Score = dec.Float64()
+	x.UserId = dec.String()
+	x.CreatedAt = dec.String()
+	x.ErrorMessage = dec.String()
 }
 
 var _ codegen.AutoMarshal = (*SupabaseConfig)(nil)
