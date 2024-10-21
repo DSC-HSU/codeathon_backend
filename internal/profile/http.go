@@ -42,7 +42,7 @@ func Api(service ProfileService) {
 		}
 		err = service.Update(c, profile)
 		if err != nil {
-			c.JSON(404, gin.H{
+			c.JSON(400, gin.H{
 				"message": err.Error(),
 			})
 			return
@@ -54,7 +54,7 @@ func Api(service ProfileService) {
 		id := c.Param("id")
 		err := service.Delete(c, id)
 		if err != nil {
-			c.JSON(404, gin.H{
+			c.JSON(400, gin.H{
 				"message": err.Error(),
 			})
 			return

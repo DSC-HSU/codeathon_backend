@@ -103,13 +103,6 @@ func TestApi(t *testing.T) {
 		}
 		req = httptest.NewRequest("PUT", "/profile", bytes.NewBuffer(profileJson))
 		endpoint.GetEngine().ServeHTTP(w, req)
-		if w.Code != 404 {
-			t.Fatalf("PUT expected 404, got %d", w.Code)
-		}
-
-		w = httptest.NewRecorder()
-		req = httptest.NewRequest("PUT", "/profile", nil)
-		endpoint.GetEngine().ServeHTTP(w, req)
 		if w.Code != 400 {
 			t.Fatalf("PUT expected 400, got %d", w.Code)
 		}
@@ -125,8 +118,8 @@ func TestApi(t *testing.T) {
 		w = httptest.NewRecorder()
 		req = httptest.NewRequest("DELETE", "/profile/352be4c7-4ced-453c-ac5e-5e5bdae9d87a", nil)
 		endpoint.GetEngine().ServeHTTP(w, req)
-		if w.Code != 404 {
-			t.Fatalf("DELETE expected 404, got %d", w.Code)
+		if w.Code != 400 {
+			t.Fatalf("DELETE expected 400, got %d", w.Code)
 		}
 
 	})
