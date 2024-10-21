@@ -2,7 +2,7 @@ package domain
 
 import "github.com/ServiceWeaver/weaver"
 
-type Quest struct {
+type Challenge struct {
 	weaver.AutoMarshal
 	Id            string   `json:"id"`
 	Title         string   `json:"title"`

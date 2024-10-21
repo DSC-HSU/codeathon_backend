@@ -104,4 +104,5 @@ require (
 	modernc.org/sqlite v1.24.0 // indirect
 	modernc.org/strutil v1.1.3 // indirect
 	modernc.org/token v1.0.1 // indirect
+	rogchap.com/v8go v0.9.0 // indirect
 )
