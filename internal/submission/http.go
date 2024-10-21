@@ -9,9 +9,13 @@ import (
 func Api(service SubmissionService) {
 	r := endpoint.GetEngine()
 
-	r.GET("/submission/:id", func(c *gin.Context) {
-		id := c.Param("id")
-		submission, err := service.GetById(c, id)
+	r.GET("/submission", func(c *gin.Context) {
+
+		//get challenge id and user id from query
+		challengeId := c.Query("challenge_id")
+		userId := c.Query("user_id")
+
+		submission, err := service.GetByChallengeIdAndUserId(c, userId, challengeId)
 		if err != nil {
 			c.JSON(400, gin.H{
 				"message": err.Error(),
@@ -38,18 +42,6 @@ func Api(service SubmissionService) {
 			return
 		}
 		c.JSON(200, submission)
-	})
-
-	r.GET("/submission/list/:id", func(c *gin.Context) {
-		id := c.Param("id")
-		submissions, err := service.List(c, id, &domain.ListOpts{})
-		if err != nil {
-			c.JSON(400, gin.H{
-				"message": err.Error(),
-			})
-			return
-		}
-		c.JSON(200, submissions)
 	})
 
 	r.PUT("/submission", func(c *gin.Context) {
