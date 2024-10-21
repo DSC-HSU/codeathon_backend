@@ -22,7 +22,7 @@ import (
 // you run "go build" or "go run".
 var _ codegen.LatestVersion = codegen.Version[[0][24]struct{}](`
 
-ERROR: You generated this file with 'weaver generate' v0.24.5 (codegen
+ERROR: You generated this file with 'weaver generate' v0.24.6 (codegen
 version v0.24.0). The generated code is incompatible with the version of the
 github.com/ServiceWeaver/weaver module that you're using. The weaver module
 version can be found in your go.mod file or by running the following command.
@@ -96,6 +96,172 @@ func (x *DefaultAccount) WeaverUnmarshal(dec *codegen.Decoder) {
 	}
 	x.Email = dec.String()
 	x.Password = dec.String()
+}
+
+var _ codegen.AutoMarshal = (*ListOpts)(nil)
+
+type __is_ListOpts[T ~struct {
+	weaver.AutoMarshal
+	Limit  int "json:\"limit\""
+	Offset int "json:\"offset\""
+}] struct{}
+
+var _ __is_ListOpts[ListOpts]
+
+func (x *ListOpts) WeaverMarshal(enc *codegen.Encoder) {
+	if x == nil {
+		panic(fmt.Errorf("ListOpts.WeaverMarshal: nil receiver"))
+	}
+	enc.Int(x.Limit)
+	enc.Int(x.Offset)
+}
+
+func (x *ListOpts) WeaverUnmarshal(dec *codegen.Decoder) {
+	if x == nil {
+		panic(fmt.Errorf("ListOpts.WeaverUnmarshal: nil receiver"))
+	}
+	x.Limit = dec.Int()
+	x.Offset = dec.Int()
+}
+
+var _ codegen.AutoMarshal = (*Profile)(nil)
+
+type __is_Profile[T ~struct {
+	weaver.AutoMarshal
+	Id            string "json:\"id\""
+	Email         string "json:\"email\""
+	FullName      string "json:\"full_name\""
+	AvatarUrl     string "json:\"avatar_url\""
+	LinkedDevPass string "json:\"linked_dev_pass\""
+}] struct{}
+
+var _ __is_Profile[Profile]
+
+func (x *Profile) WeaverMarshal(enc *codegen.Encoder) {
+	if x == nil {
+		panic(fmt.Errorf("Profile.WeaverMarshal: nil receiver"))
+	}
+	enc.String(x.Id)
+	enc.String(x.Email)
+	enc.String(x.FullName)
+	enc.String(x.AvatarUrl)
+	enc.String(x.LinkedDevPass)
+}
+
+func (x *Profile) WeaverUnmarshal(dec *codegen.Decoder) {
+	if x == nil {
+		panic(fmt.Errorf("Profile.WeaverUnmarshal: nil receiver"))
+	}
+	x.Id = dec.String()
+	x.Email = dec.String()
+	x.FullName = dec.String()
+	x.AvatarUrl = dec.String()
+	x.LinkedDevPass = dec.String()
+}
+
+var _ codegen.AutoMarshal = (*Quest)(nil)
+
+type __is_Quest[T ~struct {
+	weaver.AutoMarshal
+	Id            string   "json:\"id\""
+	Title         string   "json:\"title\""
+	Description   string   "json:\"description\""
+	PhotoUrl      string   "json:\"photo_url\""
+	Points        int      "json:\"points\""
+	Statement     string   "json:\"statement\""
+	CreatedAt     int64    "json:\"created_at\""
+	EvalScript    string   "json:\"eval_script\""
+	InputFileUrls []string "json:\"input_file_urls\""
+}] struct{}
+
+var _ __is_Quest[Quest]
+
+func (x *Quest) WeaverMarshal(enc *codegen.Encoder) {
+	if x == nil {
+		panic(fmt.Errorf("Quest.WeaverMarshal: nil receiver"))
+	}
+	enc.String(x.Id)
+	enc.String(x.Title)
+	enc.String(x.Description)
+	enc.String(x.PhotoUrl)
+	enc.Int(x.Points)
+	enc.String(x.Statement)
+	enc.Int64(x.CreatedAt)
+	enc.String(x.EvalScript)
+	serviceweaver_enc_slice_string_4af10117(enc, x.InputFileUrls)
+}
+
+func (x *Quest) WeaverUnmarshal(dec *codegen.Decoder) {
+	if x == nil {
+		panic(fmt.Errorf("Quest.WeaverUnmarshal: nil receiver"))
+	}
+	x.Id = dec.String()
+	x.Title = dec.String()
+	x.Description = dec.String()
+	x.PhotoUrl = dec.String()
+	x.Points = dec.Int()
+	x.Statement = dec.String()
+	x.CreatedAt = dec.Int64()
+	x.EvalScript = dec.String()
+	x.InputFileUrls = serviceweaver_dec_slice_string_4af10117(dec)
+}
+
+func serviceweaver_enc_slice_string_4af10117(enc *codegen.Encoder, arg []string) {
+	if arg == nil {
+		enc.Len(-1)
+		return
+	}
+	enc.Len(len(arg))
+	for i := 0; i < len(arg); i++ {
+		enc.String(arg[i])
+	}
+}
+
+func serviceweaver_dec_slice_string_4af10117(dec *codegen.Decoder) []string {
+	n := dec.Len()
+	if n == -1 {
+		return nil
+	}
+	res := make([]string, n)
+	for i := 0; i < n; i++ {
+		res[i] = dec.String()
+	}
+	return res
+}
+
+var _ codegen.AutoMarshal = (*Submission)(nil)
+
+type __is_Submission[T ~struct {
+	weaver.AutoMarshal
+	Id             string   "json:\"id\""
+	QuestId        string   "json:\"quest_id\""
+	UserId         string   "json:\"user_id\""
+	OutputFileUrls []string "json:\"output_file_urls\""
+	SubmittedAt    int64    "json:\"submitted_at\""
+}] struct{}
+
+var _ __is_Submission[Submission]
+
+func (x *Submission) WeaverMarshal(enc *codegen.Encoder) {
+	if x == nil {
+		panic(fmt.Errorf("Submission.WeaverMarshal: nil receiver"))
+	}
+	enc.String(x.Id)
+	enc.String(x.QuestId)
+	enc.String(x.UserId)
+	serviceweaver_enc_slice_string_4af10117(enc, x.OutputFileUrls)
+	enc.Int64(x.SubmittedAt)
+}
+
+func (x *Submission) WeaverUnmarshal(dec *codegen.Decoder) {
+	if x == nil {
+		panic(fmt.Errorf("Submission.WeaverUnmarshal: nil receiver"))
+	}
+	x.Id = dec.String()
+	x.QuestId = dec.String()
+	x.UserId = dec.String()
+	x.OutputFileUrls = serviceweaver_dec_slice_string_4af10117(dec)
+	x.SubmittedAt = dec.Int64()
 }
 
 var _ codegen.AutoMarshal = (*SupabaseConfig)(nil)

@@ -1,6 +1,9 @@
 package domain
 
+import "github.com/ServiceWeaver/weaver"
+
 type Quest struct {
+	weaver.AutoMarshal
 	Id            string   `json:"id"`
 	Title         string   `json:"title"`
 	Description   string   `json:"description"`
