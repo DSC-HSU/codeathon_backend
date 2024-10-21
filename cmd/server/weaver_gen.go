@@ -27,7 +27,7 @@ func init() {
 		ReflectStubFn: func(caller func(string, context.Context, []any, []any) error) any {
 			return main_reflect_stub{caller: caller}
 		},
-		RefData: "⟦2248fb79:wEaVeRlIsTeNeRs:github.com/ServiceWeaver/weaver/Main→listener⟧\n",
+		RefData: "⟦a69afd87:wEaVeReDgE:github.com/ServiceWeaver/weaver/Main→codeathon.runwayclub.dev/internal/profile/ProfileService⟧\n⟦2248fb79:wEaVeRlIsTeNeRs:github.com/ServiceWeaver/weaver/Main→listener⟧\n",
 	})
 }
 
@@ -61,7 +61,7 @@ var _ weaver.Main = (*main_client_stub)(nil)
 // you run "go build" or "go run".
 var _ codegen.LatestVersion = codegen.Version[[0][24]struct{}](`
 
-ERROR: You generated this file with 'weaver generate' v0.24.5 (codegen
+ERROR: You generated this file with 'weaver generate' v0.24.6 (codegen
 version v0.24.0). The generated code is incompatible with the version of the
 github.com/ServiceWeaver/weaver module that you're using. The weaver module
 version can be found in your go.mod file or by running the following command.
