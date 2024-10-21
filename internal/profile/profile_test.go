@@ -60,7 +60,6 @@ func TestProfileService(t *testing.T) {
 
 	// test update profile
 	profile.FullName = "test"
-	fmt.Printf("%v\n", profile)
 	err = service.Update(context.Background(), profile)
 	if err != nil {
 		t.Fatal(err)
@@ -71,5 +70,15 @@ func TestProfileService(t *testing.T) {
 	}
 	if profile.FullName != "test" {
 		t.Fatalf("full name not match, expected: test, got: %s", profile.FullName)
+	}
+
+	// test delete profile
+	err = service.Delete(context.Background(), token.User.ID.String())
+	if err != nil {
+		t.Fatal(err)
+	}
+	profile, err = service.GetById(context.Background(), token.User.ID.String())
+	if err == nil {
+		t.Fatal("profile should be deleted")
 	}
 }
