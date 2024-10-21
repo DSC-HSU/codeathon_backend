@@ -10,7 +10,6 @@ import (
 
 type ProfileService interface {
 	GetById(ctx context.Context, id string) (*domain.Profile, error)
-	//Create(ctx context.Context, profile *domain.Profile) error
 	List(ctx context.Context, opts *domain.ListOpts) ([]*domain.Profile, error)
 	Update(ctx context.Context, profile *domain.Profile) error
 	Delete(ctx context.Context, id string) error
