@@ -21,10 +21,10 @@ func init() {
 		Iface: reflect.TypeOf((*LeaderboardService)(nil)).Elem(),
 		Impl:  reflect.TypeOf(leaderboardService{}),
 		LocalStubFn: func(impl any, caller string, tracer trace.Tracer) any {
-			return leaderboardService_local_stub{impl: impl.(LeaderboardService), tracer: tracer, getByCIdMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "codeathon.runwayclub.dev/internal/leaderboard/LeaderboardService", Method: "GetByCId", Remote: false, Generated: true}), recalculateMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "codeathon.runwayclub.dev/internal/leaderboard/LeaderboardService", Method: "Recalculate", Remote: false, Generated: true})}
+			return leaderboardService_local_stub{impl: impl.(LeaderboardService), tracer: tracer, getByCIdMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "codeathon.runwayclub.dev/internal/leaderboard/LeaderboardService", Method: "GetByCId", Remote: false, Generated: true}), getGlobalMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "codeathon.runwayclub.dev/internal/leaderboard/LeaderboardService", Method: "GetGlobal", Remote: false, Generated: true}), recalculateMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "codeathon.runwayclub.dev/internal/leaderboard/LeaderboardService", Method: "Recalculate", Remote: false, Generated: true})}
 		},
 		ClientStubFn: func(stub codegen.Stub, caller string) any {
-			return leaderboardService_client_stub{stub: stub, getByCIdMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "codeathon.runwayclub.dev/internal/leaderboard/LeaderboardService", Method: "GetByCId", Remote: true, Generated: true}), recalculateMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "codeathon.runwayclub.dev/internal/leaderboard/LeaderboardService", Method: "Recalculate", Remote: true, Generated: true})}
+			return leaderboardService_client_stub{stub: stub, getByCIdMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "codeathon.runwayclub.dev/internal/leaderboard/LeaderboardService", Method: "GetByCId", Remote: true, Generated: true}), getGlobalMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "codeathon.runwayclub.dev/internal/leaderboard/LeaderboardService", Method: "GetGlobal", Remote: true, Generated: true}), recalculateMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "codeathon.runwayclub.dev/internal/leaderboard/LeaderboardService", Method: "Recalculate", Remote: true, Generated: true})}
 		},
 		ServerStubFn: func(impl any, addLoad func(uint64, float64)) codegen.Server {
 			return leaderboardService_server_stub{impl: impl.(LeaderboardService), addLoad: addLoad}
@@ -48,6 +48,7 @@ type leaderboardService_local_stub struct {
 	impl               LeaderboardService
 	tracer             trace.Tracer
 	getByCIdMetrics    *codegen.MethodMetrics
+	getGlobalMetrics   *codegen.MethodMetrics
 	recalculateMetrics *codegen.MethodMetrics
 }
 
@@ -72,6 +73,26 @@ func (s leaderboardService_local_stub) GetByCId(ctx context.Context, a0 string, 
 	}
 
 	return s.impl.GetByCId(ctx, a0, a1)
+}
+
+func (s leaderboardService_local_stub) GetGlobal(ctx context.Context, a0 *domain.ListOpts) (r0 *Leaderboard, err error) {
+	// Update metrics.
+	begin := s.getGlobalMetrics.Begin()
+	defer func() { s.getGlobalMetrics.End(begin, err != nil, 0, 0) }()
+	span := trace.SpanFromContext(ctx)
+	if span.SpanContext().IsValid() {
+		// Create a child span for this method.
+		ctx, span = s.tracer.Start(ctx, "leaderboard.LeaderboardService.GetGlobal", trace.WithSpanKind(trace.SpanKindInternal))
+		defer func() {
+			if err != nil {
+				span.RecordError(err)
+				span.SetStatus(codes.Error, err.Error())
+			}
+			span.End()
+		}()
+	}
+
+	return s.impl.GetGlobal(ctx, a0)
 }
 
 func (s leaderboardService_local_stub) Recalculate(ctx context.Context, a0 string) (err error) {
@@ -99,6 +120,7 @@ func (s leaderboardService_local_stub) Recalculate(ctx context.Context, a0 strin
 type leaderboardService_client_stub struct {
 	stub               codegen.Stub
 	getByCIdMetrics    *codegen.MethodMetrics
+	getGlobalMetrics   *codegen.MethodMetrics
 	recalculateMetrics *codegen.MethodMetrics
 }
 
@@ -157,6 +179,57 @@ func (s leaderboardService_client_stub) GetByCId(ctx context.Context, a0 string,
 	return
 }
 
+func (s leaderboardService_client_stub) GetGlobal(ctx context.Context, a0 *domain.ListOpts) (r0 *Leaderboard, err error) {
+	// Update metrics.
+	var requestBytes, replyBytes int
+	begin := s.getGlobalMetrics.Begin()
+	defer func() { s.getGlobalMetrics.End(begin, err != nil, requestBytes, replyBytes) }()
+
+	span := trace.SpanFromContext(ctx)
+	if span.SpanContext().IsValid() {
+		// Create a child span for this method.
+		ctx, span = s.stub.Tracer().Start(ctx, "leaderboard.LeaderboardService.GetGlobal", trace.WithSpanKind(trace.SpanKindClient))
+	}
+
+	defer func() {
+		// Catch and return any panics detected during encoding/decoding/rpc.
+		if err == nil {
+			err = codegen.CatchPanics(recover())
+			if err != nil {
+				err = errors.Join(weaver.RemoteCallError, err)
+			}
+		}
+
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, err.Error())
+		}
+		span.End()
+
+	}()
+
+	// Encode arguments.
+	enc := codegen.NewEncoder()
+	serviceweaver_enc_ptr_ListOpts_73a4ea72(enc, a0)
+	var shardKey uint64
+
+	// Call the remote method.
+	requestBytes = len(enc.Data())
+	var results []byte
+	results, err = s.stub.Run(ctx, 1, enc.Data(), shardKey)
+	replyBytes = len(results)
+	if err != nil {
+		err = errors.Join(weaver.RemoteCallError, err)
+		return
+	}
+
+	// Decode the results.
+	dec := codegen.NewDecoder(results)
+	r0 = serviceweaver_dec_ptr_Leaderboard_de222c7e(dec)
+	err = dec.Error()
+	return
+}
+
 func (s leaderboardService_client_stub) Recalculate(ctx context.Context, a0 string) (err error) {
 	// Update metrics.
 	var requestBytes, replyBytes int
@@ -199,7 +272,7 @@ func (s leaderboardService_client_stub) Recalculate(ctx context.Context, a0 stri
 	// Call the remote method.
 	requestBytes = len(enc.Data())
 	var results []byte
-	results, err = s.stub.Run(ctx, 1, enc.Data(), shardKey)
+	results, err = s.stub.Run(ctx, 2, enc.Data(), shardKey)
 	replyBytes = len(results)
 	if err != nil {
 		err = errors.Join(weaver.RemoteCallError, err)
@@ -250,6 +323,8 @@ func (s leaderboardService_server_stub) GetStubFn(method string) func(ctx contex
 	switch method {
 	case "GetByCId":
 		return s.getByCId
+	case "GetGlobal":
+		return s.getGlobal
 	case "Recalculate":
 		return s.recalculate
 	default:
@@ -276,6 +351,31 @@ func (s leaderboardService_server_stub) getByCId(ctx context.Context, args []byt
 	// user code: fix this.
 	// Call the local method.
 	r0, appErr := s.impl.GetByCId(ctx, a0, a1)
+
+	// Encode the results.
+	enc := codegen.NewEncoder()
+	serviceweaver_enc_ptr_Leaderboard_de222c7e(enc, r0)
+	enc.Error(appErr)
+	return enc.Data(), nil
+}
+
+func (s leaderboardService_server_stub) getGlobal(ctx context.Context, args []byte) (res []byte, err error) {
+	// Catch and return any panics detected during encoding/decoding/rpc.
+	defer func() {
+		if err == nil {
+			err = codegen.CatchPanics(recover())
+		}
+	}()
+
+	// Decode arguments.
+	dec := codegen.NewDecoder(args)
+	var a0 *domain.ListOpts
+	a0 = serviceweaver_dec_ptr_ListOpts_73a4ea72(dec)
+
+	// TODO(rgrandl): The deferred function above will recover from panics in the
+	// user code: fix this.
+	// Call the local method.
+	r0, appErr := s.impl.GetGlobal(ctx, a0)
 
 	// Encode the results.
 	enc := codegen.NewEncoder()
@@ -322,6 +422,11 @@ func (s leaderboardService_reflect_stub) GetByCId(ctx context.Context, a0 string
 	return
 }
 
+func (s leaderboardService_reflect_stub) GetGlobal(ctx context.Context, a0 *domain.ListOpts) (r0 *Leaderboard, err error) {
+	err = s.caller("GetGlobal", ctx, []any{a0}, []any{&r0})
+	return
+}
+
 func (s leaderboardService_reflect_stub) Recalculate(ctx context.Context, a0 string) (err error) {
 	err = s.caller("Recalculate", ctx, []any{a0}, []any{})
 	return
@@ -333,8 +438,8 @@ var _ codegen.AutoMarshal = (*Leaderboard)(nil)
 
 type __is_Leaderboard[T ~struct {
 	weaver.AutoMarshal
-	TotalPage int                  "json:\"total_page\""
-	Data      []*domain.Submission "json:\"data\""
+	EndPage int                  "json:\"end_page\""
+	Data    []*domain.Submission "json:\"data\""
 }] struct{}
 
 var _ __is_Leaderboard[Leaderboard]
@@ -343,7 +448,7 @@ func (x *Leaderboard) WeaverMarshal(enc *codegen.Encoder) {
 	if x == nil {
 		panic(fmt.Errorf("Leaderboard.WeaverMarshal: nil receiver"))
 	}
-	enc.Int(x.TotalPage)
+	enc.Int(x.EndPage)
 	serviceweaver_enc_slice_ptr_Submission_6530ab64(enc, x.Data)
 }
 
@@ -351,7 +456,7 @@ func (x *Leaderboard) WeaverUnmarshal(dec *codegen.Decoder) {
 	if x == nil {
 		panic(fmt.Errorf("Leaderboard.WeaverUnmarshal: nil receiver"))
 	}
-	x.TotalPage = dec.Int()
+	x.EndPage = dec.Int()
 	x.Data = serviceweaver_dec_slice_ptr_Submission_6530ab64(dec)
 }
 

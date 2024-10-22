@@ -5,6 +5,8 @@ import (
 	"codeathon.runwayclub.dev/internal/conf"
 	"codeathon.runwayclub.dev/internal/supabase"
 	"codeathon.runwayclub.dev/utils"
+	"context"
+	"fmt"
 	"testing"
 )
 
@@ -34,30 +36,71 @@ func TestLeaderBoardService(t *testing.T) {
 			ChallengeId:    "1",
 			UserId:         "00000000-00000000-00000000-00000001",
 			SubmittedAt:    "2024-10-21 08:15:46+00",
+			Score:          10,
 		},
 		&domain.Submission{
 			OutputFileUrls: []string{"https://test.com"},
 			ChallengeId:    "1",
 			UserId:         "00000000-00000000-00000000-00000002",
 			SubmittedAt:    "2024-10-21 08:15:46+00",
+			Score:          73,
 		},
 		&domain.Submission{
 			OutputFileUrls: []string{"https://test.com"},
 			ChallengeId:    "1",
 			UserId:         "00000000-00000000-00000000-00000003",
 			SubmittedAt:    "2024-10-21 08:15:46+00",
+			Score:          100,
 		},
 		&domain.Submission{
 			OutputFileUrls: []string{"https://test.com"},
 			ChallengeId:    "1",
 			UserId:         "00000000-00000000-00000000-00000004",
 			SubmittedAt:    "2024-10-21 08:15:46+00",
+			Score:          50,
 		},
 		&domain.Submission{
 			OutputFileUrls: []string{"https://test.com"},
 			ChallengeId:    "1",
 			UserId:         "00000000-00000000-00000000-00000005",
 			SubmittedAt:    "2024-10-21 08:15:46+00",
+			Score:          90,
+		},
+		// change challenge id
+		&domain.Submission{
+			OutputFileUrls: []string{"https://test.com"},
+			ChallengeId:    "2",
+			UserId:         "00000000-00000000-00000000-00000006",
+			SubmittedAt:    "2024-10-21 08:15:46+00",
+			Score:          10,
+		},
+		&domain.Submission{
+			OutputFileUrls: []string{"https://test.com"},
+			ChallengeId:    "2",
+			UserId:         "00000000-00000000-00000000-00000007",
+			SubmittedAt:    "2024-10-21 08:15:46+00",
+			Score:          73,
+		},
+		&domain.Submission{
+			OutputFileUrls: []string{"https://test.com"},
+			ChallengeId:    "2",
+			UserId:         "00000000-00000000-00000000-00000008",
+			SubmittedAt:    "2024-10-21 08:15:46+00",
+			Score:          100,
+		},
+		&domain.Submission{
+			OutputFileUrls: []string{"https://test.com"},
+			ChallengeId:    "2",
+			UserId:         "00000000-00000000-00000000-00000009",
+			SubmittedAt:    "2024-10-21 08:15:46+00",
+			Score:          50,
+		},
+		&domain.Submission{
+			OutputFileUrls: []string{"https://test.com"},
+			ChallengeId:    "2",
+			UserId:         "00000000-00000000-00000000-00000010",
+			SubmittedAt:    "2024-10-21 08:15:46+00",
+			Score:          90,
 		},
 	}
 
@@ -72,15 +115,38 @@ func TestLeaderBoardService(t *testing.T) {
 
 	service := &leaderboardService{}
 
+	// test recalculate
+	err = service.Recalculate(context.Background(), "1")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = service.Recalculate(context.Background(), "2")
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	// test get by cid
-	leaderboard, err := service.GetByCId(nil, "1", &domain.ListOpts{Offset: 0, Limit: 2})
+	leaderboard, err := service.GetByCId(context.Background(), "1", &domain.ListOpts{Offset: 0, Limit: 5})
 	if err != nil {
 		t.Fatal(err)
 	}
 	if leaderboard == nil {
 		t.Fatal("leaderboard is nil")
 	}
-	if len(leaderboard.Data) != 2 {
-		t.Fatalf("expected 2, got: %d", len(leaderboard.Data))
+	if len(leaderboard.Data) != 5 {
+		t.Fatalf("expected 5, got %v", len(leaderboard.Data))
 	}
+
+	// test get global
+	leaderboard, err = service.GetGlobal(context.Background(), &domain.ListOpts{Offset: 0, Limit: 5})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if leaderboard == nil {
+		t.Fatal("leaderboard is nil")
+	}
+	if len(leaderboard.Data) != 5 {
+		t.Fatalf("expected 5, got %v", len(leaderboard.Data))
+	}
+	fmt.Printf("%v", leaderboard)
 }

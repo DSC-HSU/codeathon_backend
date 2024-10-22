@@ -4,19 +4,19 @@ import (
 	"codeathon.runwayclub.dev/domain"
 	"codeathon.runwayclub.dev/internal/supabase"
 	"context"
+	"encoding/json"
+	"fmt"
 	"github.com/ServiceWeaver/weaver"
-	"github.com/supabase-community/postgrest-go"
-	"math"
-	"strconv"
 )
 
 type Leaderboard struct {
 	weaver.AutoMarshal
-	TotalPage int                  `json:"total_page"`
-	Data      []*domain.Submission `json:"data"`
+	EndPage int                  `json:"end_page"`
+	Data    []*domain.Submission `json:"data"`
 }
 
 type LeaderboardService interface {
+	GetGlobal(ctx context.Context, listOpts *domain.ListOpts) (*Leaderboard, error)
 	GetByCId(ctx context.Context, cId string, listOpts *domain.ListOpts) (*Leaderboard, error)
 	Recalculate(ctx context.Context, cId string) error
 }
@@ -25,31 +25,33 @@ type leaderboardService struct {
 	weaver.Implements[LeaderboardService]
 }
 
+func (l leaderboardService) GetGlobal(ctx context.Context, listOpts *domain.ListOpts) (*Leaderboard, error) {
+	str := supabase.Client.Rpc("get_global_leaderboard", "", map[string]interface{}{"offset_value": listOpts.Offset, "limit_value": listOpts.Limit})
+	fmt.Printf("%v", str)
+	var leaderboard []*Leaderboard
+	err := json.Unmarshal([]byte(str), &leaderboard)
+	if err != nil {
+		return nil, err
+	}
+	fmt.Printf("%v", leaderboard[0].Data)
+	return leaderboard[0], nil
+}
+
 func (l leaderboardService) GetByCId(ctx context.Context, cId string, listOpts *domain.ListOpts) (*Leaderboard, error) {
-
-	data := &[]*domain.Submission{}
-	_, err := supabase.Client.From("submissions").Select("*", "", false).Eq("id", cId).Order("score", &postgrest.OrderOpts{Ascending: false}).Range(listOpts.Offset, listOpts.Limit+listOpts.Offset, "").ExecuteTo(data)
+	str := supabase.Client.Rpc("get_leaderboard", "", map[string]interface{}{
+		"cid":          cId,
+		"offset_value": listOpts.Offset,
+		"limit_value":  listOpts.Limit})
+	var leaderboard []*Leaderboard
+	err := json.Unmarshal([]byte(str), &leaderboard)
 	if err != nil {
 		return nil, err
 	}
-	// get total page
-	totalData, _, err := supabase.Client.From("submissions").Select("count(*)", "", false).Eq("cid", cId).Execute()
-	// bytes to string
-	countAll, err := strconv.Atoi(string(totalData))
-	if err != nil {
-		return nil, err
-	}
-
-	totalPage := math.Ceil(float64(countAll) / float64(listOpts.Limit))
-
-	return &Leaderboard{
-		TotalPage: int(totalPage),
-		Data:      *data,
-	}, nil
-
+	return leaderboard[0], nil
 }
 
 func (l leaderboardService) Recalculate(ctx context.Context, cId string) error {
-	//TODO implement me
-	panic("implement me")
+	str := supabase.Client.Rpc("recalculate_rank_score", "", map[string]interface{}{"cid": cId})
+	fmt.Printf("%v", str)
+	return nil
 }
