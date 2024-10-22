@@ -86,8 +86,6 @@ func Api(service ChallengeService) {
 	})
 
 	r.POST("/challenge/scoring", func(c *gin.Context) {
-
-		//id := c.Param("id")
 		// Extract the file from the request
 		file, err := c.FormFile("scriptFile")
 		if err != nil {

@@ -133,7 +133,7 @@ func (c challengeService) Scoring(ctx context.Context, submission *domain.Submis
 
 		// Return the score as part of the SubmitResult struct
 		result := &domain.SubmitResult{
-			Id:           strconv.FormatInt(time.Now().UnixMilli(), 10),
+			Id:           strconv.FormatInt(time.Now().Unix(), 10),
 			Score:        score,
 			UserId:       submission.UserId,
 			CreatedAt:    submission.SubmittedAt,
