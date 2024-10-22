@@ -54,7 +54,6 @@ type __is_Challenge[T ~struct {
 	Title         string   "json:\"title\""
 	Description   string   "json:\"description\""
 	PhotoUrl      string   "json:\"photo_url\""
-	Points        int      "json:\"points\""
 	Statement     string   "json:\"statement\""
 	CreatedAt     string   "json:\"created_at\""
 	EvalScript    string   "json:\"eval_script\""
@@ -71,7 +70,6 @@ func (x *Challenge) WeaverMarshal(enc *codegen.Encoder) {
 	enc.String(x.Title)
 	enc.String(x.Description)
 	enc.String(x.PhotoUrl)
-	enc.Int(x.Points)
 	enc.String(x.Statement)
 	enc.String(x.CreatedAt)
 	enc.String(x.EvalScript)
@@ -86,7 +84,6 @@ func (x *Challenge) WeaverUnmarshal(dec *codegen.Decoder) {
 	x.Title = dec.String()
 	x.Description = dec.String()
 	x.PhotoUrl = dec.String()
-	x.Points = dec.Int()
 	x.Statement = dec.String()
 	x.CreatedAt = dec.String()
 	x.EvalScript = dec.String()

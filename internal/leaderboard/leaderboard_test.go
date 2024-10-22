@@ -31,31 +31,31 @@ func TestLeaderBoardService(t *testing.T) {
 	dummySubmissionData := &[]*domain.Submission{
 		&domain.Submission{
 			OutputFileUrls: []string{"https://test.com"},
-			ChallengeId:    1,
+			ChallengeId:    "1",
 			UserId:         "00000000-00000000-00000000-00000001",
 			SubmittedAt:    "2024-10-21 08:15:46+00",
 		},
 		&domain.Submission{
 			OutputFileUrls: []string{"https://test.com"},
-			ChallengeId:    1,
+			ChallengeId:    "1",
 			UserId:         "00000000-00000000-00000000-00000002",
 			SubmittedAt:    "2024-10-21 08:15:46+00",
 		},
 		&domain.Submission{
 			OutputFileUrls: []string{"https://test.com"},
-			ChallengeId:    1,
+			ChallengeId:    "1",
 			UserId:         "00000000-00000000-00000000-00000003",
 			SubmittedAt:    "2024-10-21 08:15:46+00",
 		},
 		&domain.Submission{
 			OutputFileUrls: []string{"https://test.com"},
-			ChallengeId:    1,
+			ChallengeId:    "1",
 			UserId:         "00000000-00000000-00000000-00000004",
 			SubmittedAt:    "2024-10-21 08:15:46+00",
 		},
 		&domain.Submission{
 			OutputFileUrls: []string{"https://test.com"},
-			ChallengeId:    1,
+			ChallengeId:    "1",
 			UserId:         "00000000-00000000-00000000-00000005",
 			SubmittedAt:    "2024-10-21 08:15:46+00",
 		},
