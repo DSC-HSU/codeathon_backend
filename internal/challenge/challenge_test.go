@@ -41,8 +41,7 @@ func TestChallengeService(t *testing.T) {
 
 	// Create a mock submission with a valid script that returns a score
 	mockSubmission := &domain.Submission{
-		Id:          "1",
-		QuestId:     "1",
+		ChallengeId: "1",
 		UserId:      token.User.ID.String(),
 		SubmittedAt: time.Now().Unix(),
 	}
