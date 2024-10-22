@@ -1,6 +1,9 @@
 package domain
 
-import "github.com/ServiceWeaver/weaver"
+import (
+	"encoding/json"
+	"github.com/ServiceWeaver/weaver"
+)
 
 type ListOpts struct {
 	weaver.AutoMarshal
@@ -9,7 +12,15 @@ type ListOpts struct {
 }
 
 type ListResult[T any] struct {
-	weaver.AutoMarshal
 	TotalPage int64 `json:"total_page"`
 	Data      []T   `json:"data"`
+}
+
+func (l *ListResult[T]) UnmarshalBinary(data []byte) error {
+	return json.Unmarshal(data, l)
+}
+
+func (l *ListResult[T]) MarshalBinary() (data []byte, err error) {
+	data, err = json.Marshal(l)
+	return
 }

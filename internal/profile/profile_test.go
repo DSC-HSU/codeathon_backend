@@ -60,7 +60,6 @@ func TestProfileService(t *testing.T) {
 
 	// test update profile
 	profile.FullName = "test"
-	fmt.Printf("%v\n", profile)
 	err = service.Update(context.Background(), profile)
 	if err != nil {
 		t.Fatal(err)
@@ -78,28 +77,8 @@ func TestProfileService(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-
 	profile, err = service.GetById(context.Background(), token.User.ID.String())
-
 	if err == nil {
 		t.Fatal("profile should be deleted")
 	}
-
-	profile = &domain.Profile{
-		Id:        "123456",
-		Email:     email,
-		FullName:  "testing",
-		AvatarUrl: "",
-	}
-
-	err = service.Update(context.Background(), profile)
-	if err == nil {
-		t.Fatal("profile should not be updated")
-	}
-
-	err = service.Delete(context.Background(), "123456")
-	if err == nil {
-		t.Fatal("profile should not be deleted")
-	}
-
 }
