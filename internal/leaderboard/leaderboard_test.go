@@ -7,6 +7,7 @@ import (
 	"codeathon.runwayclub.dev/utils"
 	"context"
 	"fmt"
+	"github.com/google/uuid"
 	"testing"
 )
 
@@ -23,87 +24,87 @@ func TestLeaderBoardService(t *testing.T) {
 
 	supabase.Init()
 
-	// delete all data in submissions table
-	_, _, err = supabase.Client.From("submissions").Delete("", "").Neq("id", "-1").Execute()
-	if err != nil {
-		t.Fatal(err)
+	// create test data
+	challengeId1 := uuid.New()
+	challengeId2 := uuid.New()
+
+	// create dummy challenge
+	dummyChallengeData := &[]*domain.Challenge{
+		&domain.Challenge{
+			Id:          challengeId1,
+			Title:       "Challenge 1",
+			Description: "Challenge 1",
+		},
+		&domain.Challenge{
+			Id:          challengeId2,
+			Title:       "Challenge 2",
+			Description: "Challenge 2",
+		},
 	}
 
-	// create test data
+	for _, challenge := range *dummyChallengeData {
+		_, _, err := supabase.Client.From("challenges").
+			Insert(challenge, false, "", "", "").
+			Execute()
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	// create dummy submissions
 	dummySubmissionData := &[]*domain.Submission{
 		&domain.Submission{
-			OutputFileUrls: []string{"https://test.com"},
-			ChallengeId:    "1",
-			UserId:         "00000000-00000000-00000000-00000001",
-			SubmittedAt:    "2024-10-21 08:15:46+00",
-			Score:          10,
+			ChallengeId: challengeId1,
+			UserId:      uuid.New(),
+			Score:       10,
 		},
 		&domain.Submission{
-			OutputFileUrls: []string{"https://test.com"},
-			ChallengeId:    "1",
-			UserId:         "00000000-00000000-00000000-00000002",
-			SubmittedAt:    "2024-10-21 08:15:46+00",
-			Score:          73,
+			ChallengeId: challengeId1,
+			UserId:      uuid.New(),
+			Score:       73,
 		},
 		&domain.Submission{
-			OutputFileUrls: []string{"https://test.com"},
-			ChallengeId:    "1",
-			UserId:         "00000000-00000000-00000000-00000003",
-			SubmittedAt:    "2024-10-21 08:15:46+00",
-			Score:          100,
+			ChallengeId: challengeId1,
+			UserId:      uuid.New(),
+			Score:       100,
 		},
 		&domain.Submission{
-			OutputFileUrls: []string{"https://test.com"},
-			ChallengeId:    "1",
-			UserId:         "00000000-00000000-00000000-00000004",
-			SubmittedAt:    "2024-10-21 08:15:46+00",
-			Score:          50,
+			ChallengeId: challengeId1,
+			UserId:      uuid.New(),
+			Score:       50,
 		},
 		&domain.Submission{
-			OutputFileUrls: []string{"https://test.com"},
-			ChallengeId:    "1",
-			UserId:         "00000000-00000000-00000000-00000005",
-			SubmittedAt:    "2024-10-21 08:15:46+00",
-			Score:          90,
+			ChallengeId: challengeId1,
+			UserId:      uuid.New(),
+			Score:       90,
 		},
 		// change challenge id
 		&domain.Submission{
-			OutputFileUrls: []string{"https://test.com"},
-			ChallengeId:    "2",
-			UserId:         "00000000-00000000-00000000-00000006",
-			SubmittedAt:    "2024-10-21 08:15:46+00",
-			Score:          10,
+			ChallengeId: challengeId2,
+			UserId:      uuid.New(),
+			Score:       10,
 		},
 		&domain.Submission{
-			OutputFileUrls: []string{"https://test.com"},
-			ChallengeId:    "2",
-			UserId:         "00000000-00000000-00000000-00000007",
-			SubmittedAt:    "2024-10-21 08:15:46+00",
-			Score:          73,
+			ChallengeId: challengeId2,
+			UserId:      uuid.New(),
+			Score:       73,
 		},
 		&domain.Submission{
-			OutputFileUrls: []string{"https://test.com"},
-			ChallengeId:    "2",
-			UserId:         "00000000-00000000-00000000-00000008",
-			SubmittedAt:    "2024-10-21 08:15:46+00",
-			Score:          100,
+			ChallengeId: challengeId2,
+			UserId:      uuid.New(),
+			Score:       100,
 		},
 		&domain.Submission{
-			OutputFileUrls: []string{"https://test.com"},
-			ChallengeId:    "2",
-			UserId:         "00000000-00000000-00000000-00000009",
-			SubmittedAt:    "2024-10-21 08:15:46+00",
-			Score:          50,
+			ChallengeId: challengeId2,
+			UserId:      uuid.New(),
+			Score:       50,
 		},
 		&domain.Submission{
-			OutputFileUrls: []string{"https://test.com"},
-			ChallengeId:    "2",
-			UserId:         "00000000-00000000-00000000-00000010",
-			SubmittedAt:    "2024-10-21 08:15:46+00",
-			Score:          90,
+			ChallengeId: challengeId2,
+			UserId:      uuid.New(),
+			Score:       90,
 		},
 	}
-
 	for _, submission := range *dummySubmissionData {
 		_, _, err := supabase.Client.From("submissions").
 			Insert(submission, false, "", "", "").
@@ -116,17 +117,17 @@ func TestLeaderBoardService(t *testing.T) {
 	service := &leaderboardService{}
 
 	// test recalculate
-	err = service.Recalculate(context.Background(), "1")
+	err = service.Recalculate(context.Background(), challengeId1.String())
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = service.Recalculate(context.Background(), "2")
+	err = service.Recalculate(context.Background(), challengeId2.String())
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	// test get by cid
-	leaderboard, err := service.GetByCId(context.Background(), "1", &domain.ListOpts{Offset: 0, Limit: 5})
+	leaderboard, err := service.GetByCId(context.Background(), challengeId1.String(), &domain.ListOpts{Offset: 0, Limit: 5})
 	if err != nil {
 		t.Fatal(err)
 	}

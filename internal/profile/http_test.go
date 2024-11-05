@@ -11,6 +11,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/ServiceWeaver/weaver/weavertest"
+	"github.com/google/uuid"
 	"log"
 	"net/http/httptest"
 	"testing"
@@ -58,6 +59,14 @@ func TestApi(t *testing.T) {
 		w = httptest.NewRecorder()
 		req = httptest.NewRequest("GET", "/profile/123", nil)
 		endpoint.GetEngine().ServeHTTP(w, req)
+		if w.Code != 400 {
+			t.Fatalf("GET profile expected 400, got %d", w.Code)
+		}
+
+		// tét get profile by error id
+		w = httptest.NewRecorder()
+		req = httptest.NewRequest("GET", "/profile/352be4c7-4ced-453c-ac5e-5e5bdae9d87a", nil)
+		endpoint.GetEngine().ServeHTTP(w, req)
 		if w.Code != 404 {
 			t.Fatalf("GET profile expected 404, got %d", w.Code)
 		}
@@ -70,10 +79,18 @@ func TestApi(t *testing.T) {
 			t.Fatalf("GET list profiles expected 200, got %d", w.Code)
 		}
 
+		// test list profiles with limit and offset
+		w = httptest.NewRecorder()
+		req = httptest.NewRequest("GET", "/profiles?limit=10&offset=1", nil)
+		endpoint.GetEngine().ServeHTTP(w, req)
+		if w.Code != 200 {
+			t.Fatalf("GET list profiles expected 200, got %d", w.Code)
+		}
+
 		// test update profile
 		w = httptest.NewRecorder()
 		profileById := &domain.Profile{
-			Id:        token.User.ID.String(),
+			Id:        token.User.ID,
 			Email:     email,
 			FullName:  "testing",
 			AvatarUrl: "",
@@ -92,7 +109,7 @@ func TestApi(t *testing.T) {
 
 		w = httptest.NewRecorder()
 		profile := &domain.Profile{
-			Id:        "123",
+			Id:        uuid.New(),
 			Email:     "123@gmail",
 			FullName:  "",
 			AvatarUrl: "",
@@ -103,8 +120,8 @@ func TestApi(t *testing.T) {
 		}
 		req = httptest.NewRequest("PUT", "/profile", bytes.NewBuffer(profileJson))
 		endpoint.GetEngine().ServeHTTP(w, req)
-		if w.Code != 400 {
-			t.Fatalf("PUT expected 400, got %d", w.Code)
+		if w.Code != 404 {
+			t.Fatalf("PUT expected 404, got %d", w.Code)
 		}
 
 		// test delete profile
@@ -117,6 +134,13 @@ func TestApi(t *testing.T) {
 
 		w = httptest.NewRecorder()
 		req = httptest.NewRequest("DELETE", "/profile/352be4c7-4ced-453c-ac5e-5e5bdae9d87a", nil)
+		endpoint.GetEngine().ServeHTTP(w, req)
+		if w.Code != 404 {
+			t.Fatalf("DELETE expected 404, got %d", w.Code)
+		}
+
+		w = httptest.NewRecorder()
+		req = httptest.NewRequest("DELETE", "/profile/123", nil)
 		endpoint.GetEngine().ServeHTTP(w, req)
 		if w.Code != 400 {
 			t.Fatalf("DELETE expected 400, got %d", w.Code)

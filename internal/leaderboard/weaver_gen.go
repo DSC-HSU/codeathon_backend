@@ -75,7 +75,7 @@ func (s leaderboardService_local_stub) GetByCId(ctx context.Context, a0 string, 
 	return s.impl.GetByCId(ctx, a0, a1)
 }
 
-func (s leaderboardService_local_stub) GetGlobal(ctx context.Context, a0 *domain.ListOpts) (r0 *Leaderboard, err error) {
+func (s leaderboardService_local_stub) GetGlobal(ctx context.Context, a0 *domain.ListOpts) (r0 *GlobalLeaderboard, err error) {
 	// Update metrics.
 	begin := s.getGlobalMetrics.Begin()
 	defer func() { s.getGlobalMetrics.End(begin, err != nil, 0, 0) }()
@@ -179,7 +179,7 @@ func (s leaderboardService_client_stub) GetByCId(ctx context.Context, a0 string,
 	return
 }
 
-func (s leaderboardService_client_stub) GetGlobal(ctx context.Context, a0 *domain.ListOpts) (r0 *Leaderboard, err error) {
+func (s leaderboardService_client_stub) GetGlobal(ctx context.Context, a0 *domain.ListOpts) (r0 *GlobalLeaderboard, err error) {
 	// Update metrics.
 	var requestBytes, replyBytes int
 	begin := s.getGlobalMetrics.Begin()
@@ -225,7 +225,7 @@ func (s leaderboardService_client_stub) GetGlobal(ctx context.Context, a0 *domai
 
 	// Decode the results.
 	dec := codegen.NewDecoder(results)
-	r0 = serviceweaver_dec_ptr_Leaderboard_de222c7e(dec)
+	r0 = serviceweaver_dec_ptr_GlobalLeaderboard_cbe1d782(dec)
 	err = dec.Error()
 	return
 }
@@ -379,7 +379,7 @@ func (s leaderboardService_server_stub) getGlobal(ctx context.Context, args []by
 
 	// Encode the results.
 	enc := codegen.NewEncoder()
-	serviceweaver_enc_ptr_Leaderboard_de222c7e(enc, r0)
+	serviceweaver_enc_ptr_GlobalLeaderboard_cbe1d782(enc, r0)
 	enc.Error(appErr)
 	return enc.Data(), nil
 }
@@ -422,7 +422,7 @@ func (s leaderboardService_reflect_stub) GetByCId(ctx context.Context, a0 string
 	return
 }
 
-func (s leaderboardService_reflect_stub) GetGlobal(ctx context.Context, a0 *domain.ListOpts) (r0 *Leaderboard, err error) {
+func (s leaderboardService_reflect_stub) GetGlobal(ctx context.Context, a0 *domain.ListOpts) (r0 *GlobalLeaderboard, err error) {
 	err = s.caller("GetGlobal", ctx, []any{a0}, []any{&r0})
 	return
 }
@@ -433,6 +433,73 @@ func (s leaderboardService_reflect_stub) Recalculate(ctx context.Context, a0 str
 }
 
 // AutoMarshal implementations.
+
+var _ codegen.AutoMarshal = (*GlobalLeaderboard)(nil)
+
+type __is_GlobalLeaderboard[T ~struct {
+	weaver.AutoMarshal
+	EndPage int                         "json:\"end_page\""
+	Data    []*domain.GlobalLeaderboard "json:\"data\""
+}] struct{}
+
+var _ __is_GlobalLeaderboard[GlobalLeaderboard]
+
+func (x *GlobalLeaderboard) WeaverMarshal(enc *codegen.Encoder) {
+	if x == nil {
+		panic(fmt.Errorf("GlobalLeaderboard.WeaverMarshal: nil receiver"))
+	}
+	enc.Int(x.EndPage)
+	serviceweaver_enc_slice_ptr_GlobalLeaderboard_f46ab7ce(enc, x.Data)
+}
+
+func (x *GlobalLeaderboard) WeaverUnmarshal(dec *codegen.Decoder) {
+	if x == nil {
+		panic(fmt.Errorf("GlobalLeaderboard.WeaverUnmarshal: nil receiver"))
+	}
+	x.EndPage = dec.Int()
+	x.Data = serviceweaver_dec_slice_ptr_GlobalLeaderboard_f46ab7ce(dec)
+}
+
+func serviceweaver_enc_ptr_GlobalLeaderboard_8b17b208(enc *codegen.Encoder, arg *domain.GlobalLeaderboard) {
+	if arg == nil {
+		enc.Bool(false)
+	} else {
+		enc.Bool(true)
+		(*arg).WeaverMarshal(enc)
+	}
+}
+
+func serviceweaver_dec_ptr_GlobalLeaderboard_8b17b208(dec *codegen.Decoder) *domain.GlobalLeaderboard {
+	if !dec.Bool() {
+		return nil
+	}
+	var res domain.GlobalLeaderboard
+	(&res).WeaverUnmarshal(dec)
+	return &res
+}
+
+func serviceweaver_enc_slice_ptr_GlobalLeaderboard_f46ab7ce(enc *codegen.Encoder, arg []*domain.GlobalLeaderboard) {
+	if arg == nil {
+		enc.Len(-1)
+		return
+	}
+	enc.Len(len(arg))
+	for i := 0; i < len(arg); i++ {
+		serviceweaver_enc_ptr_GlobalLeaderboard_8b17b208(enc, arg[i])
+	}
+}
+
+func serviceweaver_dec_slice_ptr_GlobalLeaderboard_f46ab7ce(dec *codegen.Decoder) []*domain.GlobalLeaderboard {
+	n := dec.Len()
+	if n == -1 {
+		return nil
+	}
+	res := make([]*domain.GlobalLeaderboard, n)
+	for i := 0; i < n; i++ {
+		res[i] = serviceweaver_dec_ptr_GlobalLeaderboard_8b17b208(dec)
+	}
+	return res
+}
 
 var _ codegen.AutoMarshal = (*Leaderboard)(nil)
 
@@ -535,6 +602,24 @@ func serviceweaver_dec_ptr_Leaderboard_de222c7e(dec *codegen.Decoder) *Leaderboa
 		return nil
 	}
 	var res Leaderboard
+	(&res).WeaverUnmarshal(dec)
+	return &res
+}
+
+func serviceweaver_enc_ptr_GlobalLeaderboard_cbe1d782(enc *codegen.Encoder, arg *GlobalLeaderboard) {
+	if arg == nil {
+		enc.Bool(false)
+	} else {
+		enc.Bool(true)
+		(*arg).WeaverMarshal(enc)
+	}
+}
+
+func serviceweaver_dec_ptr_GlobalLeaderboard_cbe1d782(dec *codegen.Decoder) *GlobalLeaderboard {
+	if !dec.Bool() {
+		return nil
+	}
+	var res GlobalLeaderboard
 	(&res).WeaverUnmarshal(dec)
 	return &res
 }

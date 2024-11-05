@@ -10,7 +10,7 @@ import (
 
 type ProfileService interface {
 	GetById(ctx context.Context, id string) (*domain.Profile, error)
-	List(ctx context.Context, opts *domain.ListOpts) ([]*domain.Profile, error)
+	List(ctx context.Context, opts *domain.ListOpts) (*domain.ListResult[*domain.Profile], error)
 	Update(ctx context.Context, profile *domain.Profile) error
 	Delete(ctx context.Context, id string) error
 }
@@ -32,8 +32,10 @@ func (p profileService) GetById(ctx context.Context, id string) (*domain.Profile
 	return profile, nil
 }
 
-func (p profileService) List(ctx context.Context, opts *domain.ListOpts) ([]*domain.Profile, error) {
-	data, _, err := supabase.Client.From("profiles").Select("*", "", false).Range(opts.Offset, opts.Offset+opts.Limit, "").Execute()
+func (p profileService) List(ctx context.Context, opts *domain.ListOpts) (*domain.ListResult[*domain.Profile], error) {
+	data, count, err := supabase.Client.From("profiles").
+		Select("*", "exact", false).
+		Range(opts.Offset, opts.Offset+opts.Limit-1, "").Execute()
 	if err != nil {
 		return nil, err
 	}
@@ -42,11 +44,15 @@ func (p profileService) List(ctx context.Context, opts *domain.ListOpts) ([]*dom
 	if err != nil {
 		return nil, err
 	}
-	return profiles, nil
+
+	return &domain.ListResult[*domain.Profile]{
+		TotalPage: count,
+		Data:      profiles,
+	}, nil
 }
 
 func (p profileService) Update(ctx context.Context, profile *domain.Profile) error {
-	_, _, err := supabase.Client.From("profiles").Update(profile, "", "").Eq("id", profile.Id).Execute()
+	_, _, err := supabase.Client.From("profiles").Update(profile, "", "").Eq("id", profile.Id.String()).Execute()
 	return err
 }
 

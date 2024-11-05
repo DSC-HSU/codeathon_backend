@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"github.com/ServiceWeaver/weaver"
 	"github.com/ServiceWeaver/weaver/runtime/codegen"
+	"github.com/google/uuid"
+	"time"
 )
 
 // weaver.InstanceOf checks.
@@ -50,14 +52,11 @@ var _ codegen.AutoMarshal = (*Challenge)(nil)
 
 type __is_Challenge[T ~struct {
 	weaver.AutoMarshal
-	Id            string   "json:\"id\""
-	Title         string   "json:\"title\""
-	Description   string   "json:\"description\""
-	PhotoUrl      string   "json:\"photo_url\""
-	Statement     string   "json:\"statement\""
-	CreatedAt     string   "json:\"created_at\""
-	EvalScript    string   "json:\"eval_script\""
-	InputFileUrls []string "json:\"input_file_urls\""
+	Id          uuid.UUID "json:\"id\""
+	Title       string    "json:\"title\""
+	Description string    "json:\"description\""
+	Statement   string    "json:\"statement\""
+	EvalScript  string    "json:\"eval_script\""
 }] struct{}
 
 var _ __is_Challenge[Challenge]
@@ -66,51 +65,22 @@ func (x *Challenge) WeaverMarshal(enc *codegen.Encoder) {
 	if x == nil {
 		panic(fmt.Errorf("Challenge.WeaverMarshal: nil receiver"))
 	}
-	enc.String(x.Id)
+	enc.EncodeBinaryMarshaler(&x.Id)
 	enc.String(x.Title)
 	enc.String(x.Description)
-	enc.String(x.PhotoUrl)
 	enc.String(x.Statement)
-	enc.String(x.CreatedAt)
 	enc.String(x.EvalScript)
-	serviceweaver_enc_slice_string_4af10117(enc, x.InputFileUrls)
 }
 
 func (x *Challenge) WeaverUnmarshal(dec *codegen.Decoder) {
 	if x == nil {
 		panic(fmt.Errorf("Challenge.WeaverUnmarshal: nil receiver"))
 	}
-	x.Id = dec.String()
+	dec.DecodeBinaryUnmarshaler(&x.Id)
 	x.Title = dec.String()
 	x.Description = dec.String()
-	x.PhotoUrl = dec.String()
 	x.Statement = dec.String()
-	x.CreatedAt = dec.String()
 	x.EvalScript = dec.String()
-	x.InputFileUrls = serviceweaver_dec_slice_string_4af10117(dec)
-}
-
-func serviceweaver_enc_slice_string_4af10117(enc *codegen.Encoder, arg []string) {
-	if arg == nil {
-		enc.Len(-1)
-		return
-	}
-	enc.Len(len(arg))
-	for i := 0; i < len(arg); i++ {
-		enc.String(arg[i])
-	}
-}
-
-func serviceweaver_dec_slice_string_4af10117(dec *codegen.Decoder) []string {
-	n := dec.Len()
-	if n == -1 {
-		return nil
-	}
-	res := make([]string, n)
-	for i := 0; i < n; i++ {
-		res[i] = dec.String()
-	}
-	return res
 }
 
 var _ codegen.AutoMarshal = (*Config)(nil)
@@ -165,16 +135,42 @@ func (x *DefaultAccount) WeaverUnmarshal(dec *codegen.Decoder) {
 	x.Password = dec.String()
 }
 
+var _ codegen.AutoMarshal = (*GlobalLeaderboard)(nil)
+
+type __is_GlobalLeaderboard[T ~struct {
+	weaver.AutoMarshal
+	UId   uuid.UUID "json:\"user_id\""
+	Score float64   "json:\"global_rank_score\""
+}] struct{}
+
+var _ __is_GlobalLeaderboard[GlobalLeaderboard]
+
+func (x *GlobalLeaderboard) WeaverMarshal(enc *codegen.Encoder) {
+	if x == nil {
+		panic(fmt.Errorf("GlobalLeaderboard.WeaverMarshal: nil receiver"))
+	}
+	enc.EncodeBinaryMarshaler(&x.UId)
+	enc.Float64(x.Score)
+}
+
+func (x *GlobalLeaderboard) WeaverUnmarshal(dec *codegen.Decoder) {
+	if x == nil {
+		panic(fmt.Errorf("GlobalLeaderboard.WeaverUnmarshal: nil receiver"))
+	}
+	dec.DecodeBinaryUnmarshaler(&x.UId)
+	x.Score = dec.Float64()
+}
+
 var _ codegen.AutoMarshal = (*Leaderboard)(nil)
 
 type __is_Leaderboard[T ~struct {
 	weaver.AutoMarshal
-	CId          string "json:\"c_id\""
-	UId          string "json:\"u_id\""
-	Score        int    "json:\"score\""
-	SubmittedAt  string "json:\"submitted_at\""
-	LatestUpdate string "json:\"latest_update\""
-	RankScore    int    "json:\"rank_score\""
+	CId          uuid.UUID "json:\"c_id\""
+	UId          uuid.UUID "json:\"u_id\""
+	Score        int       "json:\"score\""
+	SubmittedAt  time.Time "json:\"submitted_at\""
+	LatestUpdate string    "json:\"latest_update\""
+	RankScore    int       "json:\"rank_score\""
 }] struct{}
 
 var _ __is_Leaderboard[Leaderboard]
@@ -183,10 +179,10 @@ func (x *Leaderboard) WeaverMarshal(enc *codegen.Encoder) {
 	if x == nil {
 		panic(fmt.Errorf("Leaderboard.WeaverMarshal: nil receiver"))
 	}
-	enc.String(x.CId)
-	enc.String(x.UId)
+	enc.EncodeBinaryMarshaler(&x.CId)
+	enc.EncodeBinaryMarshaler(&x.UId)
 	enc.Int(x.Score)
-	enc.String(x.SubmittedAt)
+	enc.EncodeBinaryMarshaler(&x.SubmittedAt)
 	enc.String(x.LatestUpdate)
 	enc.Int(x.RankScore)
 }
@@ -195,10 +191,10 @@ func (x *Leaderboard) WeaverUnmarshal(dec *codegen.Decoder) {
 	if x == nil {
 		panic(fmt.Errorf("Leaderboard.WeaverUnmarshal: nil receiver"))
 	}
-	x.CId = dec.String()
-	x.UId = dec.String()
+	dec.DecodeBinaryUnmarshaler(&x.CId)
+	dec.DecodeBinaryUnmarshaler(&x.UId)
 	x.Score = dec.Int()
-	x.SubmittedAt = dec.String()
+	dec.DecodeBinaryUnmarshaler(&x.SubmittedAt)
 	x.LatestUpdate = dec.String()
 	x.RankScore = dec.Int()
 }
@@ -233,11 +229,11 @@ var _ codegen.AutoMarshal = (*Profile)(nil)
 
 type __is_Profile[T ~struct {
 	weaver.AutoMarshal
-	Id            string "json:\"id\""
-	Email         string "json:\"email\""
-	FullName      string "json:\"full_name\""
-	AvatarUrl     string "json:\"avatar_url\""
-	LinkedDevPass string "json:\"linked_dev_pass\""
+	Id            uuid.UUID "json:\"id\""
+	Email         string    "json:\"email\""
+	FullName      string    "json:\"full_name\""
+	AvatarUrl     string    "json:\"avatar_url\""
+	LinkedDevPass string    "json:\"linked_dev_pass\""
 }] struct{}
 
 var _ __is_Profile[Profile]
@@ -246,7 +242,7 @@ func (x *Profile) WeaverMarshal(enc *codegen.Encoder) {
 	if x == nil {
 		panic(fmt.Errorf("Profile.WeaverMarshal: nil receiver"))
 	}
-	enc.String(x.Id)
+	enc.EncodeBinaryMarshaler(&x.Id)
 	enc.String(x.Email)
 	enc.String(x.FullName)
 	enc.String(x.AvatarUrl)
@@ -257,7 +253,7 @@ func (x *Profile) WeaverUnmarshal(dec *codegen.Decoder) {
 	if x == nil {
 		panic(fmt.Errorf("Profile.WeaverUnmarshal: nil receiver"))
 	}
-	x.Id = dec.String()
+	dec.DecodeBinaryUnmarshaler(&x.Id)
 	x.Email = dec.String()
 	x.FullName = dec.String()
 	x.AvatarUrl = dec.String()
@@ -268,12 +264,12 @@ var _ codegen.AutoMarshal = (*Submission)(nil)
 
 type __is_Submission[T ~struct {
 	weaver.AutoMarshal
-	ChallengeId    string   "json:\"challenge_id\""
-	UserId         string   "json:\"user_id\""
-	OutputFileUrls []string "json:\"output_file_urls\""
-	SubmittedAt    string   "json:\"submitted_at\""
-	Score          float64  "json:\"score\""
-	RankScore      float64  "json:\"rank_score\""
+	Id             uuid.UUID "json:\"id\""
+	ChallengeId    uuid.UUID "json:\"challenge_id\""
+	UserId         uuid.UUID "json:\"user_id\""
+	OutputFileUrls string    "json:\"output_file_urls\""
+	Score          float64   "json:\"score\""
+	RankScore      float64   "json:\"rank_score\""
 }] struct{}
 
 var _ __is_Submission[Submission]
@@ -282,10 +278,10 @@ func (x *Submission) WeaverMarshal(enc *codegen.Encoder) {
 	if x == nil {
 		panic(fmt.Errorf("Submission.WeaverMarshal: nil receiver"))
 	}
-	enc.String(x.ChallengeId)
-	enc.String(x.UserId)
-	serviceweaver_enc_slice_string_4af10117(enc, x.OutputFileUrls)
-	enc.String(x.SubmittedAt)
+	enc.EncodeBinaryMarshaler(&x.Id)
+	enc.EncodeBinaryMarshaler(&x.ChallengeId)
+	enc.EncodeBinaryMarshaler(&x.UserId)
+	enc.String(x.OutputFileUrls)
 	enc.Float64(x.Score)
 	enc.Float64(x.RankScore)
 }
@@ -294,10 +290,10 @@ func (x *Submission) WeaverUnmarshal(dec *codegen.Decoder) {
 	if x == nil {
 		panic(fmt.Errorf("Submission.WeaverUnmarshal: nil receiver"))
 	}
-	x.ChallengeId = dec.String()
-	x.UserId = dec.String()
-	x.OutputFileUrls = serviceweaver_dec_slice_string_4af10117(dec)
-	x.SubmittedAt = dec.String()
+	dec.DecodeBinaryUnmarshaler(&x.Id)
+	dec.DecodeBinaryUnmarshaler(&x.ChallengeId)
+	dec.DecodeBinaryUnmarshaler(&x.UserId)
+	x.OutputFileUrls = dec.String()
 	x.Score = dec.Float64()
 	x.RankScore = dec.Float64()
 }
@@ -306,12 +302,11 @@ var _ codegen.AutoMarshal = (*SubmitResult)(nil)
 
 type __is_SubmitResult[T ~struct {
 	weaver.AutoMarshal
-	Id           string  "json:\"id\""
-	ChallengeId  string  "json:\"challenge_id\""
-	Score        float64 "json:\"score\""
-	UserId       string  "json:\"user_id\""
-	CreatedAt    string  "json:\"created_at\""
-	ErrorMessage string  "json:\"error_message\""
+	Id           string    "json:\"id\""
+	ChallengeId  uuid.UUID "json:\"challenge_id\""
+	Score        float64   "json:\"score\""
+	UserId       uuid.UUID "json:\"user_id\""
+	ErrorMessage string    "json:\"error_message\""
 }] struct{}
 
 var _ __is_SubmitResult[SubmitResult]
@@ -321,10 +316,9 @@ func (x *SubmitResult) WeaverMarshal(enc *codegen.Encoder) {
 		panic(fmt.Errorf("SubmitResult.WeaverMarshal: nil receiver"))
 	}
 	enc.String(x.Id)
-	enc.String(x.ChallengeId)
+	enc.EncodeBinaryMarshaler(&x.ChallengeId)
 	enc.Float64(x.Score)
-	enc.String(x.UserId)
-	enc.String(x.CreatedAt)
+	enc.EncodeBinaryMarshaler(&x.UserId)
 	enc.String(x.ErrorMessage)
 }
 
@@ -333,10 +327,9 @@ func (x *SubmitResult) WeaverUnmarshal(dec *codegen.Decoder) {
 		panic(fmt.Errorf("SubmitResult.WeaverUnmarshal: nil receiver"))
 	}
 	x.Id = dec.String()
-	x.ChallengeId = dec.String()
+	dec.DecodeBinaryUnmarshaler(&x.ChallengeId)
 	x.Score = dec.Float64()
-	x.UserId = dec.String()
-	x.CreatedAt = dec.String()
+	dec.DecodeBinaryUnmarshaler(&x.UserId)
 	x.ErrorMessage = dec.String()
 }
 

@@ -95,7 +95,7 @@ func (s profileService_local_stub) GetById(ctx context.Context, a0 string) (r0 *
 	return s.impl.GetById(ctx, a0)
 }
 
-func (s profileService_local_stub) List(ctx context.Context, a0 *domain.ListOpts) (r0 []*domain.Profile, err error) {
+func (s profileService_local_stub) List(ctx context.Context, a0 *domain.ListOpts) (r0 *domain.ListResult[*domain.Profile], err error) {
 	// Update metrics.
 	begin := s.listMetrics.Begin()
 	defer func() { s.listMetrics.End(begin, err != nil, 0, 0) }()
@@ -259,7 +259,7 @@ func (s profileService_client_stub) GetById(ctx context.Context, a0 string) (r0 
 	return
 }
 
-func (s profileService_client_stub) List(ctx context.Context, a0 *domain.ListOpts) (r0 []*domain.Profile, err error) {
+func (s profileService_client_stub) List(ctx context.Context, a0 *domain.ListOpts) (r0 *domain.ListResult[*domain.Profile], err error) {
 	// Update metrics.
 	var requestBytes, replyBytes int
 	begin := s.listMetrics.Begin()
@@ -305,7 +305,7 @@ func (s profileService_client_stub) List(ctx context.Context, a0 *domain.ListOpt
 
 	// Decode the results.
 	dec := codegen.NewDecoder(results)
-	r0 = serviceweaver_dec_slice_ptr_Profile_442661d9(dec)
+	r0 = serviceweaver_dec_ptr_ListResult_ptr_Profile_95df334e(dec)
 	err = dec.Error()
 	return
 }
@@ -478,7 +478,7 @@ func (s profileService_server_stub) list(ctx context.Context, args []byte) (res 
 
 	// Encode the results.
 	enc := codegen.NewEncoder()
-	serviceweaver_enc_slice_ptr_Profile_442661d9(enc, r0)
+	serviceweaver_enc_ptr_ListResult_ptr_Profile_95df334e(enc, r0)
 	enc.Error(appErr)
 	return enc.Data(), nil
 }
@@ -526,7 +526,7 @@ func (s profileService_reflect_stub) GetById(ctx context.Context, a0 string) (r0
 	return
 }
 
-func (s profileService_reflect_stub) List(ctx context.Context, a0 *domain.ListOpts) (r0 []*domain.Profile, err error) {
+func (s profileService_reflect_stub) List(ctx context.Context, a0 *domain.ListOpts) (r0 *domain.ListResult[*domain.Profile], err error) {
 	err = s.caller("List", ctx, []any{a0}, []any{&r0})
 	return
 }
@@ -574,25 +574,20 @@ func serviceweaver_dec_ptr_ListOpts_73a4ea72(dec *codegen.Decoder) *domain.ListO
 	return &res
 }
 
-func serviceweaver_enc_slice_ptr_Profile_442661d9(enc *codegen.Encoder, arg []*domain.Profile) {
+func serviceweaver_enc_ptr_ListResult_ptr_Profile_95df334e(enc *codegen.Encoder, arg *domain.ListResult[*domain.Profile]) {
 	if arg == nil {
-		enc.Len(-1)
-		return
-	}
-	enc.Len(len(arg))
-	for i := 0; i < len(arg); i++ {
-		serviceweaver_enc_ptr_Profile_260fe93b(enc, arg[i])
+		enc.Bool(false)
+	} else {
+		enc.Bool(true)
+		enc.EncodeBinaryMarshaler(arg)
 	}
 }
 
-func serviceweaver_dec_slice_ptr_Profile_442661d9(dec *codegen.Decoder) []*domain.Profile {
-	n := dec.Len()
-	if n == -1 {
+func serviceweaver_dec_ptr_ListResult_ptr_Profile_95df334e(dec *codegen.Decoder) *domain.ListResult[*domain.Profile] {
+	if !dec.Bool() {
 		return nil
 	}
-	res := make([]*domain.Profile, n)
-	for i := 0; i < n; i++ {
-		res[i] = serviceweaver_dec_ptr_Profile_260fe93b(dec)
-	}
-	return res
+	var res domain.ListResult[*domain.Profile]
+	dec.DecodeBinaryUnmarshaler(&res)
+	return &res
 }

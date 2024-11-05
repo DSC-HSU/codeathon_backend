@@ -20,10 +20,10 @@ func init() {
 		Iface: reflect.TypeOf((*ChallengeService)(nil)).Elem(),
 		Impl:  reflect.TypeOf(challengeService{}),
 		LocalStubFn: func(impl any, caller string, tracer trace.Tracer) any {
-			return challengeService_local_stub{impl: impl.(ChallengeService), tracer: tracer, createMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "codeathon.runwayclub.dev/internal/challenge/ChallengeService", Method: "Create", Remote: false, Generated: true}), deleteMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "codeathon.runwayclub.dev/internal/challenge/ChallengeService", Method: "Delete", Remote: false, Generated: true}), getByIdMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "codeathon.runwayclub.dev/internal/challenge/ChallengeService", Method: "GetById", Remote: false, Generated: true}), listMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "codeathon.runwayclub.dev/internal/challenge/ChallengeService", Method: "List", Remote: false, Generated: true}), scoringMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "codeathon.runwayclub.dev/internal/challenge/ChallengeService", Method: "Scoring", Remote: false, Generated: true}), updateMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "codeathon.runwayclub.dev/internal/challenge/ChallengeService", Method: "Update", Remote: false, Generated: true})}
+			return challengeService_local_stub{impl: impl.(ChallengeService), tracer: tracer, createMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "codeathon.runwayclub.dev/internal/challenge/ChallengeService", Method: "Create", Remote: false, Generated: true}), deleteMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "codeathon.runwayclub.dev/internal/challenge/ChallengeService", Method: "Delete", Remote: false, Generated: true}), getByIdMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "codeathon.runwayclub.dev/internal/challenge/ChallengeService", Method: "GetById", Remote: false, Generated: true}), listMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "codeathon.runwayclub.dev/internal/challenge/ChallengeService", Method: "List", Remote: false, Generated: true}), scoringMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "codeathon.runwayclub.dev/internal/challenge/ChallengeService", Method: "Scoring", Remote: false, Generated: true}), updateMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "codeathon.runwayclub.dev/internal/challenge/ChallengeService", Method: "Update", Remote: false, Generated: true}), uploadEvalScriptMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "codeathon.runwayclub.dev/internal/challenge/ChallengeService", Method: "UploadEvalScript", Remote: false, Generated: true})}
 		},
 		ClientStubFn: func(stub codegen.Stub, caller string) any {
-			return challengeService_client_stub{stub: stub, createMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "codeathon.runwayclub.dev/internal/challenge/ChallengeService", Method: "Create", Remote: true, Generated: true}), deleteMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "codeathon.runwayclub.dev/internal/challenge/ChallengeService", Method: "Delete", Remote: true, Generated: true}), getByIdMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "codeathon.runwayclub.dev/internal/challenge/ChallengeService", Method: "GetById", Remote: true, Generated: true}), listMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "codeathon.runwayclub.dev/internal/challenge/ChallengeService", Method: "List", Remote: true, Generated: true}), scoringMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "codeathon.runwayclub.dev/internal/challenge/ChallengeService", Method: "Scoring", Remote: true, Generated: true}), updateMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "codeathon.runwayclub.dev/internal/challenge/ChallengeService", Method: "Update", Remote: true, Generated: true})}
+			return challengeService_client_stub{stub: stub, createMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "codeathon.runwayclub.dev/internal/challenge/ChallengeService", Method: "Create", Remote: true, Generated: true}), deleteMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "codeathon.runwayclub.dev/internal/challenge/ChallengeService", Method: "Delete", Remote: true, Generated: true}), getByIdMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "codeathon.runwayclub.dev/internal/challenge/ChallengeService", Method: "GetById", Remote: true, Generated: true}), listMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "codeathon.runwayclub.dev/internal/challenge/ChallengeService", Method: "List", Remote: true, Generated: true}), scoringMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "codeathon.runwayclub.dev/internal/challenge/ChallengeService", Method: "Scoring", Remote: true, Generated: true}), updateMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "codeathon.runwayclub.dev/internal/challenge/ChallengeService", Method: "Update", Remote: true, Generated: true}), uploadEvalScriptMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "codeathon.runwayclub.dev/internal/challenge/ChallengeService", Method: "UploadEvalScript", Remote: true, Generated: true})}
 		},
 		ServerStubFn: func(impl any, addLoad func(uint64, float64)) codegen.Server {
 			return challengeService_server_stub{impl: impl.(ChallengeService), addLoad: addLoad}
@@ -44,14 +44,15 @@ var _ weaver.Unrouted = (*challengeService)(nil)
 // Local stub implementations.
 
 type challengeService_local_stub struct {
-	impl           ChallengeService
-	tracer         trace.Tracer
-	createMetrics  *codegen.MethodMetrics
-	deleteMetrics  *codegen.MethodMetrics
-	getByIdMetrics *codegen.MethodMetrics
-	listMetrics    *codegen.MethodMetrics
-	scoringMetrics *codegen.MethodMetrics
-	updateMetrics  *codegen.MethodMetrics
+	impl                    ChallengeService
+	tracer                  trace.Tracer
+	createMetrics           *codegen.MethodMetrics
+	deleteMetrics           *codegen.MethodMetrics
+	getByIdMetrics          *codegen.MethodMetrics
+	listMetrics             *codegen.MethodMetrics
+	scoringMetrics          *codegen.MethodMetrics
+	updateMetrics           *codegen.MethodMetrics
+	uploadEvalScriptMetrics *codegen.MethodMetrics
 }
 
 // Check that challengeService_local_stub implements the ChallengeService interface.
@@ -137,7 +138,7 @@ func (s challengeService_local_stub) List(ctx context.Context, a0 *domain.ListOp
 	return s.impl.List(ctx, a0)
 }
 
-func (s challengeService_local_stub) Scoring(ctx context.Context, a0 *domain.Submission, a1 string) (r0 *domain.SubmitResult, err error) {
+func (s challengeService_local_stub) Scoring(ctx context.Context, a0 *domain.Submission) (r0 *domain.SubmitResult, err error) {
 	// Update metrics.
 	begin := s.scoringMetrics.Begin()
 	defer func() { s.scoringMetrics.End(begin, err != nil, 0, 0) }()
@@ -154,7 +155,7 @@ func (s challengeService_local_stub) Scoring(ctx context.Context, a0 *domain.Sub
 		}()
 	}
 
-	return s.impl.Scoring(ctx, a0, a1)
+	return s.impl.Scoring(ctx, a0)
 }
 
 func (s challengeService_local_stub) Update(ctx context.Context, a0 *domain.Challenge) (err error) {
@@ -177,16 +178,37 @@ func (s challengeService_local_stub) Update(ctx context.Context, a0 *domain.Chal
 	return s.impl.Update(ctx, a0)
 }
 
+func (s challengeService_local_stub) UploadEvalScript(ctx context.Context, a0 string, a1 []byte) (r0 string, err error) {
+	// Update metrics.
+	begin := s.uploadEvalScriptMetrics.Begin()
+	defer func() { s.uploadEvalScriptMetrics.End(begin, err != nil, 0, 0) }()
+	span := trace.SpanFromContext(ctx)
+	if span.SpanContext().IsValid() {
+		// Create a child span for this method.
+		ctx, span = s.tracer.Start(ctx, "challenge.ChallengeService.UploadEvalScript", trace.WithSpanKind(trace.SpanKindInternal))
+		defer func() {
+			if err != nil {
+				span.RecordError(err)
+				span.SetStatus(codes.Error, err.Error())
+			}
+			span.End()
+		}()
+	}
+
+	return s.impl.UploadEvalScript(ctx, a0, a1)
+}
+
 // Client stub implementations.
 
 type challengeService_client_stub struct {
-	stub           codegen.Stub
-	createMetrics  *codegen.MethodMetrics
-	deleteMetrics  *codegen.MethodMetrics
-	getByIdMetrics *codegen.MethodMetrics
-	listMetrics    *codegen.MethodMetrics
-	scoringMetrics *codegen.MethodMetrics
-	updateMetrics  *codegen.MethodMetrics
+	stub                    codegen.Stub
+	createMetrics           *codegen.MethodMetrics
+	deleteMetrics           *codegen.MethodMetrics
+	getByIdMetrics          *codegen.MethodMetrics
+	listMetrics             *codegen.MethodMetrics
+	scoringMetrics          *codegen.MethodMetrics
+	updateMetrics           *codegen.MethodMetrics
+	uploadEvalScriptMetrics *codegen.MethodMetrics
 }
 
 // Check that challengeService_client_stub implements the ChallengeService interface.
@@ -404,7 +426,7 @@ func (s challengeService_client_stub) List(ctx context.Context, a0 *domain.ListO
 	return
 }
 
-func (s challengeService_client_stub) Scoring(ctx context.Context, a0 *domain.Submission, a1 string) (r0 *domain.SubmitResult, err error) {
+func (s challengeService_client_stub) Scoring(ctx context.Context, a0 *domain.Submission) (r0 *domain.SubmitResult, err error) {
 	// Update metrics.
 	var requestBytes, replyBytes int
 	begin := s.scoringMetrics.Begin()
@@ -436,7 +458,6 @@ func (s challengeService_client_stub) Scoring(ctx context.Context, a0 *domain.Su
 	// Encode arguments.
 	enc := codegen.NewEncoder()
 	serviceweaver_enc_ptr_Submission_54a2faef(enc, a0)
-	enc.String(a1)
 	var shardKey uint64
 
 	// Call the remote method.
@@ -506,6 +527,64 @@ func (s challengeService_client_stub) Update(ctx context.Context, a0 *domain.Cha
 	return
 }
 
+func (s challengeService_client_stub) UploadEvalScript(ctx context.Context, a0 string, a1 []byte) (r0 string, err error) {
+	// Update metrics.
+	var requestBytes, replyBytes int
+	begin := s.uploadEvalScriptMetrics.Begin()
+	defer func() { s.uploadEvalScriptMetrics.End(begin, err != nil, requestBytes, replyBytes) }()
+
+	span := trace.SpanFromContext(ctx)
+	if span.SpanContext().IsValid() {
+		// Create a child span for this method.
+		ctx, span = s.stub.Tracer().Start(ctx, "challenge.ChallengeService.UploadEvalScript", trace.WithSpanKind(trace.SpanKindClient))
+	}
+
+	defer func() {
+		// Catch and return any panics detected during encoding/decoding/rpc.
+		if err == nil {
+			err = codegen.CatchPanics(recover())
+			if err != nil {
+				err = errors.Join(weaver.RemoteCallError, err)
+			}
+		}
+
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, err.Error())
+		}
+		span.End()
+
+	}()
+
+	// Preallocate a buffer of the right size.
+	size := 0
+	size += (4 + len(a0))
+	size += (4 + (len(a1) * 1))
+	enc := codegen.NewEncoder()
+	enc.Reset(size)
+
+	// Encode arguments.
+	enc.String(a0)
+	serviceweaver_enc_slice_byte_87461245(enc, a1)
+	var shardKey uint64
+
+	// Call the remote method.
+	requestBytes = len(enc.Data())
+	var results []byte
+	results, err = s.stub.Run(ctx, 6, enc.Data(), shardKey)
+	replyBytes = len(results)
+	if err != nil {
+		err = errors.Join(weaver.RemoteCallError, err)
+		return
+	}
+
+	// Decode the results.
+	dec := codegen.NewDecoder(results)
+	r0 = dec.String()
+	err = dec.Error()
+	return
+}
+
 // Note that "weaver generate" will always generate the error message below.
 // Everything is okay. The error message is only relevant if you see it when
 // you run "go build" or "go run".
@@ -554,6 +633,8 @@ func (s challengeService_server_stub) GetStubFn(method string) func(ctx context.
 		return s.scoring
 	case "Update":
 		return s.update
+	case "UploadEvalScript":
+		return s.uploadEvalScript
 	default:
 		return nil
 	}
@@ -669,13 +750,11 @@ func (s challengeService_server_stub) scoring(ctx context.Context, args []byte) 
 	dec := codegen.NewDecoder(args)
 	var a0 *domain.Submission
 	a0 = serviceweaver_dec_ptr_Submission_54a2faef(dec)
-	var a1 string
-	a1 = dec.String()
 
 	// TODO(rgrandl): The deferred function above will recover from panics in the
 	// user code: fix this.
 	// Call the local method.
-	r0, appErr := s.impl.Scoring(ctx, a0, a1)
+	r0, appErr := s.impl.Scoring(ctx, a0)
 
 	// Encode the results.
 	enc := codegen.NewEncoder()
@@ -704,6 +783,33 @@ func (s challengeService_server_stub) update(ctx context.Context, args []byte) (
 
 	// Encode the results.
 	enc := codegen.NewEncoder()
+	enc.Error(appErr)
+	return enc.Data(), nil
+}
+
+func (s challengeService_server_stub) uploadEvalScript(ctx context.Context, args []byte) (res []byte, err error) {
+	// Catch and return any panics detected during encoding/decoding/rpc.
+	defer func() {
+		if err == nil {
+			err = codegen.CatchPanics(recover())
+		}
+	}()
+
+	// Decode arguments.
+	dec := codegen.NewDecoder(args)
+	var a0 string
+	a0 = dec.String()
+	var a1 []byte
+	a1 = serviceweaver_dec_slice_byte_87461245(dec)
+
+	// TODO(rgrandl): The deferred function above will recover from panics in the
+	// user code: fix this.
+	// Call the local method.
+	r0, appErr := s.impl.UploadEvalScript(ctx, a0, a1)
+
+	// Encode the results.
+	enc := codegen.NewEncoder()
+	enc.String(r0)
 	enc.Error(appErr)
 	return enc.Data(), nil
 }
@@ -737,13 +843,18 @@ func (s challengeService_reflect_stub) List(ctx context.Context, a0 *domain.List
 	return
 }
 
-func (s challengeService_reflect_stub) Scoring(ctx context.Context, a0 *domain.Submission, a1 string) (r0 *domain.SubmitResult, err error) {
-	err = s.caller("Scoring", ctx, []any{a0, a1}, []any{&r0})
+func (s challengeService_reflect_stub) Scoring(ctx context.Context, a0 *domain.Submission) (r0 *domain.SubmitResult, err error) {
+	err = s.caller("Scoring", ctx, []any{a0}, []any{&r0})
 	return
 }
 
 func (s challengeService_reflect_stub) Update(ctx context.Context, a0 *domain.Challenge) (err error) {
 	err = s.caller("Update", ctx, []any{a0}, []any{})
+	return
+}
+
+func (s challengeService_reflect_stub) UploadEvalScript(ctx context.Context, a0 string, a1 []byte) (r0 string, err error) {
+	err = s.caller("UploadEvalScript", ctx, []any{a0, a1}, []any{&r0})
 	return
 }
 
@@ -837,4 +948,27 @@ func serviceweaver_dec_ptr_SubmitResult_af2c752e(dec *codegen.Decoder) *domain.S
 	var res domain.SubmitResult
 	(&res).WeaverUnmarshal(dec)
 	return &res
+}
+
+func serviceweaver_enc_slice_byte_87461245(enc *codegen.Encoder, arg []byte) {
+	if arg == nil {
+		enc.Len(-1)
+		return
+	}
+	enc.Len(len(arg))
+	for i := 0; i < len(arg); i++ {
+		enc.Byte(arg[i])
+	}
+}
+
+func serviceweaver_dec_slice_byte_87461245(dec *codegen.Decoder) []byte {
+	n := dec.Len()
+	if n == -1 {
+		return nil
+	}
+	res := make([]byte, n)
+	for i := 0; i < n; i++ {
+		res[i] = dec.Byte()
+	}
+	return res
 }

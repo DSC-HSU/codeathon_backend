@@ -8,6 +8,8 @@ import (
 	"codeathon.runwayclub.dev/utils"
 	"context"
 	"fmt"
+	"github.com/google/uuid"
+	"strings"
 	"testing"
 )
 
@@ -49,12 +51,21 @@ func TestProfileService(t *testing.T) {
 		t.Fatalf("email not match, expected: %s, got: %s", email, profile.Email)
 	}
 
+	_, err = service.GetById(context.Background(), uuid.New().String())
+	if err == nil {
+		t.Fatal("profile should not exist")
+	}
+	expectedErrorCode := "PGRST116"
+	if !strings.Contains(err.Error(), expectedErrorCode) {
+		t.Fatalf("Expected error code %s, but got: %v", expectedErrorCode, err)
+	}
+
 	// test list profiles
 	list, err := service.List(context.Background(), &domain.ListOpts{Offset: 0, Limit: 10})
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(list) == 0 {
+	if list.TotalPage == 0 {
 		t.Fatal("profiles is empty")
 	}
 

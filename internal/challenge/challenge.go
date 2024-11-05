@@ -1,6 +1,7 @@
 package challenge
 
 import (
+	"bytes"
 	"codeathon.runwayclub.dev/domain"
 	"codeathon.runwayclub.dev/internal/submission"
 	"codeathon.runwayclub.dev/internal/supabase"
@@ -9,9 +10,9 @@ import (
 	"errors"
 	"fmt"
 	"github.com/ServiceWeaver/weaver"
+	"github.com/google/uuid"
 	v8 "rogchap.com/v8go"
-	"strconv"
-	"time"
+	"strings"
 )
 
 type ChallengeService interface {
@@ -20,12 +21,43 @@ type ChallengeService interface {
 	List(ctx context.Context, opts *domain.ListOpts) (*domain.ListResult[*domain.Challenge], error)
 	Update(ctx context.Context, challenge *domain.Challenge) error
 	Delete(ctx context.Context, id string) error
-	Scoring(ctx context.Context, submission *domain.Submission, data string) (*domain.SubmitResult, error)
+	Scoring(ctx context.Context, submission *domain.Submission) (*domain.SubmitResult, error)
+	UploadEvalScript(ctx context.Context, challengeId string, file []byte) (string, error)
 }
 
 type challengeService struct {
 	weaver.Implements[ChallengeService]
 	submissionService weaver.Ref[submission.SubmissionService]
+}
+
+func (c challengeService) UploadEvalScript(ctx context.Context, challengeId string, file []byte) (string, error) {
+	// Upload file to storage
+	fileData := bytes.NewReader(file) // assuming `file` is a byte slice
+	filename := uuid.New().String() + ".js"
+	fileResponse, err := supabase.Client.Storage.UploadFile("eval-scripts", filename, fileData)
+	if err != nil {
+		return "", err
+	}
+
+	// Get the URL of the uploaded file
+	fileUrl := fileResponse.Key
+
+	// Retrieve the existing challenge
+	challenge, err := c.GetById(ctx, challengeId)
+	if err != nil {
+		return "", err
+	}
+
+	// how to remove eval-scripts/ in fileUrl
+	challenge.EvalScript = fileUrl[13:]
+
+	// Save the updated challenge back to the database
+	err = c.Update(ctx, challenge)
+	if err != nil {
+		return "", err
+	}
+
+	return fileUrl, nil
 }
 
 func (c challengeService) GetById(ctx context.Context, id string) (*domain.Challenge, error) {
@@ -47,7 +79,7 @@ func (c challengeService) Create(ctx context.Context, challenge *domain.Challeng
 }
 
 func (c challengeService) List(ctx context.Context, opts *domain.ListOpts) (*domain.ListResult[*domain.Challenge], error) {
-	data, _, err := supabase.Client.From("challenges").Select("*", "", false).Range(opts.Offset, opts.Offset+opts.Limit, "").Execute()
+	data, count, err := supabase.Client.From("challenges").Select("*", "exact", false).Range(opts.Offset, opts.Offset+opts.Limit-1, "").Execute()
 	if err != nil {
 		return nil, err
 	}
@@ -57,29 +89,14 @@ func (c challengeService) List(ctx context.Context, opts *domain.ListOpts) (*dom
 		return nil, err
 	}
 
-	//get total page
-	data, _, err = supabase.Client.From("challenges").Select("count(*)", "", false).Execute()
-	if err != nil {
-		return nil, err
-	}
-
-	var total int64
-	err = json.Unmarshal(data, &total)
-	if err != nil {
-		return nil, err
-	}
-
-	//calculate total page
-	totalPage := total / int64(opts.Limit)
-
 	return &domain.ListResult[*domain.Challenge]{
-		TotalPage: totalPage,
+		TotalPage: count,
 		Data:      challenges,
 	}, nil
 }
 
 func (c challengeService) Update(ctx context.Context, challenge *domain.Challenge) error {
-	_, _, err := supabase.Client.From("challenges").Update(challenge, "", "").Eq("id", challenge.Id).Execute()
+	_, _, err := supabase.Client.From("challenges").Update(challenge, "", "").Eq("id", challenge.Id.String()).Execute()
 	return err
 }
 
@@ -88,98 +105,96 @@ func (c challengeService) Delete(ctx context.Context, id string) error {
 	return err
 }
 
-func (c challengeService) Scoring(ctx context.Context, submission *domain.Submission, data string) (*domain.SubmitResult, error) {
-	// Set a timeout of 5 minutes for the script execution
-	ctxWithTimeout, cancel := context.WithTimeout(ctx, 5*time.Minute)
-	defer cancel()
-
-	v8ctx := v8.NewContext() // creates a new V8 context with a new Isolate aka VM
-
-	// Channel to receive the result or error
-	resultCh := make(chan *domain.SubmitResult, 1)
-	errorCh := make(chan error, 1)
-
-	// Run the script in a separate goroutine to allow interruption
-	go func() {
-		// Run the script from the submission input
-		_, err := v8ctx.RunScript(data, "submission.js")
-		errMess := ""
-		if err != nil {
-			var e *v8.JSError
-			errors.As(err, &e)        // handle JavaScript errors
-			fmt.Println(e.Message)    // print error message
-			fmt.Println(e.Location)   // print location of error
-			fmt.Println(e.StackTrace) // print stack trace
-
-			fmt.Printf("javascript error: %v", e)
-			fmt.Printf("javascript stack trace: %+v", e)
-			errMess = e.Message
-		}
-
-		// Retrieve the result of the script (assumed to store the score in a 'score' variable)
-		val, err := v8ctx.RunScript("score", "result.js")
-		if err != nil {
-			errorCh <- fmt.Errorf("failed to get score: %v", err)
-			return
-		}
-
-		// Convert the result to a Go float64
-		score := val.Number()
-
-		if score < 0 {
-			errorCh <- errors.New("score cannot be negative")
-			return
-		}
-
-		// Return the score as part of the SubmitResult struct
-		result := &domain.SubmitResult{
-			Id:           strconv.FormatInt(time.Now().Unix(), 10),
-			Score:        score,
-			UserId:       submission.UserId,
-			CreatedAt:    submission.SubmittedAt,
-			ErrorMessage: errMess,
-		}
-
-		resultCh <- result
-	}()
-
-	select {
-	case <-ctxWithTimeout.Done():
-		// If the context times out, return a timeout error
-		return nil, errors.New("run out of time execution")
-	case err := <-errorCh:
-		// If an error occurs in the goroutine, return the error
+func (c challengeService) Scoring(ctx context.Context, submission *domain.Submission) (*domain.SubmitResult, error) {
+	// Get file  from storage by challengeId
+	challenge, err := c.GetById(ctx, submission.ChallengeId.String())
+	if err != nil {
 		return nil, err
-	case result := <-resultCh:
+	}
 
-		//get submission by challengeId and userId
-		foundedSubmission, err := c.submissionService.Get().GetByChallengeIdAndUserId(ctx, submission.UserId, submission.ChallengeId)
-		if err != nil {
-			//if submission not found, create new submission
-			newSubmission := &domain.Submission{
-				ChallengeId:    submission.ChallengeId,
-				UserId:         submission.UserId,
-				Score:          result.Score,
-				SubmittedAt:    time.DateTime,
-				OutputFileUrls: submission.OutputFileUrls,
-			}
-			err = c.submissionService.Get().Create(ctx, newSubmission)
-			if err != nil {
-				return nil, err
-			}
+	file, err := supabase.Client.Storage.DownloadFile("eval-scripts", strings.TrimSpace(challenge.EvalScript))
+	if err != nil {
+		return nil, err
+	}
+	data := string(file)
+
+	// Get output file  from storage
+	submissionFile, err := supabase.Client.Storage.DownloadFile("output-files", strings.TrimSpace(submission.OutputFileUrls))
+	if err != nil {
+		return nil, err
+	}
+	output := string(submissionFile)
+
+	v8ctx := v8.NewContext() // tạo ngữ cảnh mới cho V8
+
+	// Thiết lập biến `fileContent` trong JavaScript bằng nội dung `input`
+	_, err = v8ctx.RunScript(fmt.Sprintf("var fileContent = `%s`;", output), "output.js")
+	if err != nil {
+		fmt.Println("Lỗi thiết lập input cho JavaScript:", err)
+		return nil, err
+	}
+
+	// Chạy script JavaScript với dữ liệu `data`
+	_, err = v8ctx.RunScript(data, "submission.js")
+	errMess := ""
+	if err != nil {
+		var e *v8.JSError
+		errors.As(err, &e)        // xử lý lỗi JavaScript
+		fmt.Println(e.Message)    // in thông báo lỗi
+		fmt.Println(e.Location)   // in vị trí lỗi
+		fmt.Println(e.StackTrace) // in stack trace
+
+		fmt.Printf("javascript error: %v", e)
+		fmt.Printf("javascript stack trace: %+v", e)
+		errMess = e.Message
+	}
+
+	// Lấy kết quả tính điểm từ biến `score` trong JavaScript
+	val, err := v8ctx.RunScript("score", "result.js")
+	if err != nil {
+		return nil, err
+	}
+
+	// Chuyển đổi kết quả `score` sang kiểu số thực (float64)
+	score := val.Number()
+
+	if score < 0 {
+		return nil, errors.New("score must be greater than or equal to 0")
+	}
+
+	// Trả về kết quả dưới dạng `SubmitResult`
+	result := &domain.SubmitResult{
+		Score:        score,
+		UserId:       submission.UserId,
+		ChallengeId:  submission.ChallengeId,
+		ErrorMessage: errMess,
+	}
+
+	service := c.submissionService.Get()
+
+	// Kiểm tra xem submission đã tồn tại chưa
+	foundedSubmission, err := service.GetByChallengeIdAndUserId(ctx, submission.UserId.String(), submission.ChallengeId.String())
+	if err != nil {
+		// Nếu chưa tồn tại, tạo submission mới
+		newSubmission := &domain.Submission{
+			ChallengeId: submission.ChallengeId,
+			UserId:      submission.UserId,
+			Score:       result.Score,
 		}
-
-		//update submission score
-		foundedSubmission.Score = result.Score
-		foundedSubmission.OutputFileUrls = submission.OutputFileUrls
-		foundedSubmission.SubmittedAt = time.DateTime
-
-		err = c.submissionService.Get().Update(ctx, foundedSubmission)
+		err = c.submissionService.Get().Create(ctx, newSubmission)
 		if err != nil {
 			return nil, err
 		}
-
-		// If the script finishes successfully, return the result
-		return result, nil
 	}
+
+	// Cập nhật điểm cho submission hiện tại
+	foundedSubmission.Score = result.Score
+
+	err = c.submissionService.Get().Update(ctx, foundedSubmission)
+	if err != nil {
+		return nil, err
+	}
+
+	// Trả về kết quả sau khi hoàn thành
+	return result, nil
 }
