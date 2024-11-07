@@ -16,9 +16,7 @@ alter table "public"."submissions" drop column "created_at";
 
 alter table "public"."submissions" alter column "challenge_id" set data type uuid using "challenge_id"::uuid;
 
-alter table "public"."submissions" alter column "id" drop identity;
-
-alter table "public"."submissions" alter column "id" set data type uuid using "id"::uuid;
+alter table "public"."submissions" alter column "id" set not null ;
 
 alter table "public"."submissions" alter column "output_file_urls" set data type text using "output_file_urls"::text;
 
