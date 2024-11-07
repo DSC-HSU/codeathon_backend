@@ -3,7 +3,7 @@ drop function if exists "public"."get_leaderboard"(cid text, limit_value integer
 drop function if exists "public"."recalculate_rank_score"(cid text);
 
 create table "public"."challenges" (
-    "id" uuid not null default gen_random_uuid(),
+    "id" uuid not null,
     "created_at" timestamp with time zone not null default now(),
     "title" text,
     "description" text,
@@ -15,8 +15,6 @@ create table "public"."challenges" (
 alter table "public"."submissions" drop column "created_at";
 
 alter table "public"."submissions" alter column "challenge_id" set data type uuid using "challenge_id"::uuid;
-
-alter table "public"."submissions" alter column "id" set default gen_random_uuid();
 
 alter table "public"."submissions" alter column "id" drop identity;
 
