@@ -44,7 +44,7 @@ jobs:
                 shell: bash
 
             -   name: Build Service Weaver application
-                run: go build -o server .
+                run: weaver kube deploy config.yaml
                 shell: bash
 
             -   name: Log in to Docker Hub
