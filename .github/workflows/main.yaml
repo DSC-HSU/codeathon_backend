@@ -30,6 +30,7 @@ jobs:
                     go install github.com/ServiceWeaver/weaver-kube/cmd/weaver-kube@latest
                 env:
                     GOPATH: $HOME/go/bin
+                    GOMODCACHE: $HOME/go/bin/pkg/mod
                 shell: bash
 
             -   name: Build Service Weaver application
