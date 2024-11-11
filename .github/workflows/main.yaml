@@ -30,6 +30,7 @@ jobs:
                     export GOMODCACHE=$GOPATH/pkg/mod
                     echo "GOPATH=$GOPATH" >> $GITHUB_ENV
                     echo "GOMODCACHE=$GOMODCACHE" >> $GITHUB_ENV
+                    echo "GOCACHE=$GOCACHE" >> $GITHUB_ENV
 
             -   name: Install Service Weaver CLI
                 run: |
