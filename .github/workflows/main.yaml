@@ -26,8 +26,12 @@ jobs:
 
             -   name: Set up Go environment variables
                 run: |
+                    # Define HOME explicitly if missing
+                    export HOME=${HOME:-/home/runner}
                     export GOPATH=$HOME/go
                     export GOMODCACHE=$GOPATH/pkg/mod
+                    export GOCACHE=$GOPATH/.cache/go-build
+                    echo "HOME=$HOME" >> $GITHUB_ENV
                     echo "GOPATH=$GOPATH" >> $GITHUB_ENV
                     echo "GOMODCACHE=$GOMODCACHE" >> $GITHUB_ENV
                     echo "GOCACHE=$GOCACHE" >> $GITHUB_ENV
