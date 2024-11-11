@@ -35,6 +35,8 @@ jobs:
                     echo "GOPATH=$GOPATH" >> $GITHUB_ENV
                     echo "GOMODCACHE=$GOMODCACHE" >> $GITHUB_ENV
                     echo "GOCACHE=$GOCACHE" >> $GITHUB_ENV
+                    # Add GOPATH/bin to PATH
+                    echo "PATH=$GOPATH/bin:$PATH" >> $GITHUB_ENV
 
             -   name: Install Service Weaver CLI
                 run: |
