@@ -166,17 +166,24 @@ func TestApi(t *testing.T) {
 
 		// test put update output file
 		outputFile := []byte("test")
+		sourceCode := []byte("test")
 		body := new(bytes.Buffer)
 		writer := multipart.NewWriter(body)
-		part, err := writer.CreateFormFile("file", "output-file.txt")
+		part, err := writer.CreateFormFile("output-file", "output-file.txt")
 		if err != nil {
 			t.Fatal(err)
 		}
 		part.Write(outputFile)
+
+		part, err = writer.CreateFormFile("source-code", "source-code.txt")
+		if err != nil {
+			t.Fatal(err)
+		}
+		part.Write(sourceCode)
 		writer.Close()
 
 		w = httptest.NewRecorder()
-		req = httptest.NewRequest("POST", "/submission/"+submissionId.String()+"/output-file", body)
+		req = httptest.NewRequest("POST", "/submission/"+submissionId.String()+"/files", body)
 		req.Header.Set("Content-Type", writer.FormDataContentType())
 		endpoint.GetEngine().ServeHTTP(w, req)
 		if w.Code != 200 {
@@ -185,7 +192,7 @@ func TestApi(t *testing.T) {
 
 		// test put update output file with invalid submission id
 		w = httptest.NewRecorder()
-		req = httptest.NewRequest("POST", "/submission/"+uuid.New().String()+"/output-file", body)
+		req = httptest.NewRequest("POST", "/submission/"+uuid.New().String()+"/files", body)
 		req.Header.Set("Content-Type", writer.FormDataContentType())
 		endpoint.GetEngine().ServeHTTP(w, req)
 		if w.Code != 404 {
@@ -194,7 +201,7 @@ func TestApi(t *testing.T) {
 
 		// test put update output file with invalid file
 		w = httptest.NewRecorder()
-		req = httptest.NewRequest("POST", "/submission/"+submissionId.String()+"/output-file", body)
+		req = httptest.NewRequest("POST", "/submission/"+submissionId.String()+"/files", body)
 		req.Header.Set("Content-Type", "application/json")
 		endpoint.GetEngine().ServeHTTP(w, req)
 		if w.Code != 400 {

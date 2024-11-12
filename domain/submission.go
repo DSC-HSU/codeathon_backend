@@ -11,6 +11,7 @@ type Submission struct {
 	ChallengeId    uuid.UUID `json:"challenge_id"`
 	UserId         uuid.UUID `json:"user_id"`
 	OutputFileUrls string    `json:"output_file_urls"`
+	SourceCodeUrls string    `json:"source_code_urls"`
 	Score          float64   `json:"score"`
 	RankScore      float64   `json:"rank_score"`
 }

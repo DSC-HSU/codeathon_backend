@@ -170,27 +170,10 @@ func (c challengeService) Scoring(ctx context.Context, submission *domain.Submis
 		ErrorMessage: errMess,
 	}
 
-	service := c.submissionService.Get()
-
-	// Kiểm tra xem submission đã tồn tại chưa
-	foundedSubmission, err := service.GetByChallengeIdAndUserId(ctx, submission.UserId.String(), submission.ChallengeId.String())
-	if err != nil {
-		// Nếu chưa tồn tại, tạo submission mới
-		newSubmission := &domain.Submission{
-			ChallengeId: submission.ChallengeId,
-			UserId:      submission.UserId,
-			Score:       result.Score,
-		}
-		err = c.submissionService.Get().Create(ctx, newSubmission)
-		if err != nil {
-			return nil, err
-		}
-	}
-
 	// Cập nhật điểm cho submission hiện tại
-	foundedSubmission.Score = result.Score
+	submission.Score = result.Score
 
-	err = c.submissionService.Get().Update(ctx, foundedSubmission)
+	err = c.submissionService.Get().Update(ctx, submission)
 	if err != nil {
 		return nil, err
 	}

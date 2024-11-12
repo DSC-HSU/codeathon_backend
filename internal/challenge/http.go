@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 	"io"
 	"net/http"
+	"strconv"
 )
 
 func Api(service ChallengeService) {
@@ -57,8 +58,40 @@ func Api(service ChallengeService) {
 		c.JSON(200, challenge)
 	})
 
-	r.GET("/challenge/list", func(c *gin.Context) {
-		challenges, err := service.List(c, &domain.ListOpts{})
+	r.GET("/challenges", func(c *gin.Context) {
+		// Get limit and offset from query parameters
+		var limit, offset int
+		var err error
+
+		if l := c.Query("limit"); l != "" {
+			if limit, err = strconv.Atoi(l); err != nil {
+				c.JSON(400, gin.H{
+					"message": "Invalid limit value",
+				})
+				return
+			}
+		} else {
+			c.JSON(400, gin.H{
+				"message": "Limit is required",
+			})
+			return
+		}
+
+		if o := c.Query("offset"); o != "" {
+			if offset, err = strconv.Atoi(o); err != nil {
+				c.JSON(400, gin.H{
+					"message": "Invalid offset value",
+				})
+				return
+			}
+		} else {
+			c.JSON(400, gin.H{
+				"message": "Offset is required",
+			})
+			return
+		}
+
+		challenges, err := service.List(c, &domain.ListOpts{Offset: offset, Limit: limit})
 		if err != nil {
 			c.JSON(400, gin.H{
 				"message": err.Error(),

@@ -268,6 +268,7 @@ type __is_Submission[T ~struct {
 	ChallengeId    uuid.UUID "json:\"challenge_id\""
 	UserId         uuid.UUID "json:\"user_id\""
 	OutputFileUrls string    "json:\"output_file_urls\""
+	SourceCodeUrls string    "json:\"source_code_urls\""
 	Score          float64   "json:\"score\""
 	RankScore      float64   "json:\"rank_score\""
 }] struct{}
@@ -282,6 +283,7 @@ func (x *Submission) WeaverMarshal(enc *codegen.Encoder) {
 	enc.EncodeBinaryMarshaler(&x.ChallengeId)
 	enc.EncodeBinaryMarshaler(&x.UserId)
 	enc.String(x.OutputFileUrls)
+	enc.String(x.SourceCodeUrls)
 	enc.Float64(x.Score)
 	enc.Float64(x.RankScore)
 }
@@ -294,6 +296,7 @@ func (x *Submission) WeaverUnmarshal(dec *codegen.Decoder) {
 	dec.DecodeBinaryUnmarshaler(&x.ChallengeId)
 	dec.DecodeBinaryUnmarshaler(&x.UserId)
 	x.OutputFileUrls = dec.String()
+	x.SourceCodeUrls = dec.String()
 	x.Score = dec.Float64()
 	x.RankScore = dec.Float64()
 }

@@ -114,13 +114,13 @@ func TestSubmissionService(t *testing.T) {
 
 	//Call the UploadOutputFile function
 	file := []byte("test")
-	_, err = service.UploadOutputFile(context.Background(), mockSubmission.Id.String(), file)
+	_, err = service.UploadOutputAndSourceCode(context.Background(), mockSubmission.Id.String(), file, file)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	// Check UploadOutputFile error
-	_, err = service.UploadOutputFile(context.Background(), uuid.New().String(), file)
+	_, err = service.UploadOutputAndSourceCode(context.Background(), uuid.New().String(), file, file)
 	if err == nil {
 		t.Fatal("Expected error, but got none")
 	}

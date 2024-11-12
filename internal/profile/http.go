@@ -11,20 +11,36 @@ import (
 func Api(service ProfileService) {
 	r := endpoint.GetEngine()
 	r.GET("/profiles", func(c *gin.Context) {
-		// Lấy giá trị của limit và offset từ query parameters, với giá trị mặc định là 10 và 0 nếu không có.
-		limit := 10
-		offset := 0
+		var limit, offset int
+		var err error
 
 		// Kiểm tra xem người dùng có cung cấp limit và offset không
 		if l := c.Query("limit"); l != "" {
-			if parsedLimit, err := strconv.Atoi(l); err == nil {
-				limit = parsedLimit
+			if limit, err = strconv.Atoi(l); err != nil {
+				c.JSON(400, gin.H{
+					"message": "Invalid limit value",
+				})
+				return
 			}
+		} else {
+			c.JSON(400, gin.H{
+				"message": "Limit is required",
+			})
+			return
 		}
+
 		if o := c.Query("offset"); o != "" {
-			if parsedOffset, err := strconv.Atoi(o); err == nil {
-				offset = parsedOffset
+			if offset, err = strconv.Atoi(o); err != nil {
+				c.JSON(400, gin.H{
+					"message": "Invalid offset value",
+				})
+				return
 			}
+		} else {
+			c.JSON(400, gin.H{
+				"message": "Offset is required",
+			})
+			return
 		}
 
 		// Gọi service với các giá trị limit và offset
