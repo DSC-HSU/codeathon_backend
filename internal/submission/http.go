@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"io"
+	"net/http"
 	"strconv"
 	"strings"
 )
@@ -20,7 +21,7 @@ func Api(service SubmissionService) {
 		userId := c.Query("userID")
 
 		// Check if challengeID or userID is missing
-		if challengeId == "" || userId == "" {
+		if len(challengeId) == 0 || len(userId) == 0 {
 			c.JSON(400, gin.H{
 				"message": "challengeID and userID are required",
 			})
@@ -141,29 +142,21 @@ func Api(service SubmissionService) {
 		c.JSON(200, submission)
 	})
 
-	// Upload  files for a submission
 	r.POST("/submission/:id/files", func(c *gin.Context) {
 		id := c.Param("id")
-		// Check if the submission exists
-		_, err := service.GetById(c, id)
-		if err != nil {
-			if strings.Contains(err.Error(), "PGRST116") {
-				c.JSON(404, gin.H{
-					"message": "Submission not found",
-				})
-				return
-			}
-			c.JSON(400, gin.H{
-				"message": err.Error(),
+		// Check if 'id' is a valid UUID
+		if _, err := uuid.Parse(id); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "Invalid ID format, expected UUID",
 			})
 			return
 		}
 
-		// Extract the file from the request
-		file, err := c.FormFile("output-file")
+		// Extract the files from the request
+		file, err := c.FormFile("output_file")
 		if err != nil {
 			c.JSON(400, gin.H{
-				"message": err.Error(),
+				"message": "Failed to retrieve file: " + err.Error(),
 			})
 			return
 		}
@@ -176,6 +169,16 @@ func Api(service SubmissionService) {
 			})
 			return
 		}
+
+		// Open the uploaded file
+		fileContent, err = file.Open()
+		if err != nil {
+			c.JSON(400, gin.H{
+				"message": "Failed to open file: " + err.Error(),
+			})
+			return
+		}
+
 		defer fileContent.Close()
 
 		// Read the content of the file into a byte slice
@@ -187,17 +190,16 @@ func Api(service SubmissionService) {
 			return
 		}
 
-		// Extract the file source from the request
-		fileSource, err := c.FormFile("source-code")
+		source, err := c.FormFile("source_file")
 		if err != nil {
 			c.JSON(400, gin.H{
-				"message": err.Error(),
+				"message": "Failed to retrieve file: " + err.Error(),
 			})
 			return
 		}
 
 		// Open the uploaded file
-		fileSourceContent, err := fileSource.Open()
+		sourceContent, err := source.Open()
 		if err != nil {
 			c.JSON(400, gin.H{
 				"message": "Failed to open file: " + err.Error(),
@@ -205,10 +207,10 @@ func Api(service SubmissionService) {
 			return
 		}
 
-		defer fileSourceContent.Close()
+		defer sourceContent.Close()
 
 		// Read the content of the file into a byte slice
-		fileSourceBytes, err := io.ReadAll(fileSourceContent)
+		sourceBytes, err := io.ReadAll(sourceContent)
 		if err != nil {
 			c.JSON(400, gin.H{
 				"message": "Failed to read file: " + err.Error(),
@@ -216,17 +218,14 @@ func Api(service SubmissionService) {
 			return
 		}
 
-		fileUrl, err := service.UploadOutputAndSourceCode(c, id, fileBytes, fileSourceBytes)
+		// Upload the file to the storage
+		err = service.UploadFiles(c, id, sourceBytes, fileBytes)
 		if err != nil {
 			c.JSON(400, gin.H{
 				"message": err.Error(),
 			})
 			return
 		}
-
-		c.JSON(200, gin.H{
-			"url": fileUrl,
-		})
 
 	})
 

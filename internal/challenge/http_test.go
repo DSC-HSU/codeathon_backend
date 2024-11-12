@@ -11,6 +11,7 @@ import (
 	"encoding/json"
 	"github.com/ServiceWeaver/weaver/weavertest"
 	"log"
+	"mime/multipart"
 	"net/http/httptest"
 	"testing"
 )
@@ -70,7 +71,7 @@ func TestApi(t *testing.T) {
 
 		// test list challenge
 		w = httptest.NewRecorder()
-		req = httptest.NewRequest("GET", "/challenge/list", nil)
+		req = httptest.NewRequest("GET", "/challenges?offset=0&limit=10", nil)
 		endpoint.GetEngine().ServeHTTP(w, req)
 		if w.Code != 200 {
 			t.Fatalf("GET expected 200, got %d", w.Code)
@@ -90,6 +91,65 @@ func TestApi(t *testing.T) {
 		endpoint.GetEngine().ServeHTTP(w, req)
 		if w.Code != 404 {
 			t.Fatalf("DELETE expected 404, got %d", w.Code)
+		}
+
+		// test upload eval script through form file
+		evalScript := []byte("test")
+		body := new(bytes.Buffer)
+		writer := multipart.NewWriter(body)
+		part, err := writer.CreateFormFile("eval_script", "eval_script")
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		_, err = part.Write(evalScript)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		writer.Close()
+		w = httptest.NewRecorder()
+		req = httptest.NewRequest("POST", "/challenge/8770c63b-5f09-4f6c-a4cd-f37bfb33c819/eval-script", body)
+		req.Header.Set("Content-Type", writer.FormDataContentType())
+		endpoint.GetEngine().ServeHTTP(w, req)
+		if w.Code != 200 {
+			t.Fatalf("POST expected 200, got %d", w.Code)
+		}
+
+		// test upload many input files
+		inputFile1 := []byte("test")
+		inputFile2 := []byte("test")
+		body = new(bytes.Buffer)
+		writer = multipart.NewWriter(body)
+
+		// Create form file for inputFile1
+		part, err = writer.CreateFormFile("files", "input_file1")
+		if err != nil {
+			t.Fatal(err)
+		}
+		_, err = part.Write(inputFile1)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		// Create form file for inputFile2
+		part, err = writer.CreateFormFile("files", "input_file2")
+		if err != nil {
+			t.Fatal(err)
+		}
+		_, err = part.Write(inputFile2)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		writer.Close()
+
+		w = httptest.NewRecorder()
+		req = httptest.NewRequest("POST", "/challenge/8770c63b-5f09-4f6c-a4cd-f37bfb33c819/input-files", body)
+		req.Header.Set("Content-Type", writer.FormDataContentType())
+		endpoint.GetEngine().ServeHTTP(w, req)
+		if w.Code != 200 {
+			t.Fatalf("POST expected 200, got %d", w.Code)
 		}
 
 	})

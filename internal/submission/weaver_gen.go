@@ -20,10 +20,10 @@ func init() {
 		Iface: reflect.TypeOf((*SubmissionService)(nil)).Elem(),
 		Impl:  reflect.TypeOf(submissionService{}),
 		LocalStubFn: func(impl any, caller string, tracer trace.Tracer) any {
-			return submissionService_local_stub{impl: impl.(SubmissionService), tracer: tracer, createMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "codeathon.runwayclub.dev/internal/submission/SubmissionService", Method: "Create", Remote: false, Generated: true}), getByChallengeIdAndUserIdMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "codeathon.runwayclub.dev/internal/submission/SubmissionService", Method: "GetByChallengeIdAndUserId", Remote: false, Generated: true}), getByIdMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "codeathon.runwayclub.dev/internal/submission/SubmissionService", Method: "GetById", Remote: false, Generated: true}), updateMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "codeathon.runwayclub.dev/internal/submission/SubmissionService", Method: "Update", Remote: false, Generated: true}), uploadOutputAndSourceCodeMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "codeathon.runwayclub.dev/internal/submission/SubmissionService", Method: "UploadOutputAndSourceCode", Remote: false, Generated: true})}
+			return submissionService_local_stub{impl: impl.(SubmissionService), tracer: tracer, createMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "codeathon.runwayclub.dev/internal/submission/SubmissionService", Method: "Create", Remote: false, Generated: true}), getByChallengeIdAndUserIdMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "codeathon.runwayclub.dev/internal/submission/SubmissionService", Method: "GetByChallengeIdAndUserId", Remote: false, Generated: true}), getByIdMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "codeathon.runwayclub.dev/internal/submission/SubmissionService", Method: "GetById", Remote: false, Generated: true}), updateMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "codeathon.runwayclub.dev/internal/submission/SubmissionService", Method: "Update", Remote: false, Generated: true}), uploadFilesMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "codeathon.runwayclub.dev/internal/submission/SubmissionService", Method: "UploadFiles", Remote: false, Generated: true})}
 		},
 		ClientStubFn: func(stub codegen.Stub, caller string) any {
-			return submissionService_client_stub{stub: stub, createMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "codeathon.runwayclub.dev/internal/submission/SubmissionService", Method: "Create", Remote: true, Generated: true}), getByChallengeIdAndUserIdMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "codeathon.runwayclub.dev/internal/submission/SubmissionService", Method: "GetByChallengeIdAndUserId", Remote: true, Generated: true}), getByIdMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "codeathon.runwayclub.dev/internal/submission/SubmissionService", Method: "GetById", Remote: true, Generated: true}), updateMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "codeathon.runwayclub.dev/internal/submission/SubmissionService", Method: "Update", Remote: true, Generated: true}), uploadOutputAndSourceCodeMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "codeathon.runwayclub.dev/internal/submission/SubmissionService", Method: "UploadOutputAndSourceCode", Remote: true, Generated: true})}
+			return submissionService_client_stub{stub: stub, createMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "codeathon.runwayclub.dev/internal/submission/SubmissionService", Method: "Create", Remote: true, Generated: true}), getByChallengeIdAndUserIdMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "codeathon.runwayclub.dev/internal/submission/SubmissionService", Method: "GetByChallengeIdAndUserId", Remote: true, Generated: true}), getByIdMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "codeathon.runwayclub.dev/internal/submission/SubmissionService", Method: "GetById", Remote: true, Generated: true}), updateMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "codeathon.runwayclub.dev/internal/submission/SubmissionService", Method: "Update", Remote: true, Generated: true}), uploadFilesMetrics: codegen.MethodMetricsFor(codegen.MethodLabels{Caller: caller, Component: "codeathon.runwayclub.dev/internal/submission/SubmissionService", Method: "UploadFiles", Remote: true, Generated: true})}
 		},
 		ServerStubFn: func(impl any, addLoad func(uint64, float64)) codegen.Server {
 			return submissionService_server_stub{impl: impl.(SubmissionService), addLoad: addLoad}
@@ -50,7 +50,7 @@ type submissionService_local_stub struct {
 	getByChallengeIdAndUserIdMetrics *codegen.MethodMetrics
 	getByIdMetrics                   *codegen.MethodMetrics
 	updateMetrics                    *codegen.MethodMetrics
-	uploadOutputAndSourceCodeMetrics *codegen.MethodMetrics
+	uploadFilesMetrics               *codegen.MethodMetrics
 }
 
 // Check that submissionService_local_stub implements the SubmissionService interface.
@@ -136,14 +136,14 @@ func (s submissionService_local_stub) Update(ctx context.Context, a0 *domain.Sub
 	return s.impl.Update(ctx, a0)
 }
 
-func (s submissionService_local_stub) UploadOutputAndSourceCode(ctx context.Context, a0 string, a1 []byte, a2 []byte) (r0 string, err error) {
+func (s submissionService_local_stub) UploadFiles(ctx context.Context, a0 string, a1 []byte, a2 []byte) (err error) {
 	// Update metrics.
-	begin := s.uploadOutputAndSourceCodeMetrics.Begin()
-	defer func() { s.uploadOutputAndSourceCodeMetrics.End(begin, err != nil, 0, 0) }()
+	begin := s.uploadFilesMetrics.Begin()
+	defer func() { s.uploadFilesMetrics.End(begin, err != nil, 0, 0) }()
 	span := trace.SpanFromContext(ctx)
 	if span.SpanContext().IsValid() {
 		// Create a child span for this method.
-		ctx, span = s.tracer.Start(ctx, "submission.SubmissionService.UploadOutputAndSourceCode", trace.WithSpanKind(trace.SpanKindInternal))
+		ctx, span = s.tracer.Start(ctx, "submission.SubmissionService.UploadFiles", trace.WithSpanKind(trace.SpanKindInternal))
 		defer func() {
 			if err != nil {
 				span.RecordError(err)
@@ -153,7 +153,7 @@ func (s submissionService_local_stub) UploadOutputAndSourceCode(ctx context.Cont
 		}()
 	}
 
-	return s.impl.UploadOutputAndSourceCode(ctx, a0, a1, a2)
+	return s.impl.UploadFiles(ctx, a0, a1, a2)
 }
 
 // Client stub implementations.
@@ -164,7 +164,7 @@ type submissionService_client_stub struct {
 	getByChallengeIdAndUserIdMetrics *codegen.MethodMetrics
 	getByIdMetrics                   *codegen.MethodMetrics
 	updateMetrics                    *codegen.MethodMetrics
-	uploadOutputAndSourceCodeMetrics *codegen.MethodMetrics
+	uploadFilesMetrics               *codegen.MethodMetrics
 }
 
 // Check that submissionService_client_stub implements the SubmissionService interface.
@@ -379,16 +379,16 @@ func (s submissionService_client_stub) Update(ctx context.Context, a0 *domain.Su
 	return
 }
 
-func (s submissionService_client_stub) UploadOutputAndSourceCode(ctx context.Context, a0 string, a1 []byte, a2 []byte) (r0 string, err error) {
+func (s submissionService_client_stub) UploadFiles(ctx context.Context, a0 string, a1 []byte, a2 []byte) (err error) {
 	// Update metrics.
 	var requestBytes, replyBytes int
-	begin := s.uploadOutputAndSourceCodeMetrics.Begin()
-	defer func() { s.uploadOutputAndSourceCodeMetrics.End(begin, err != nil, requestBytes, replyBytes) }()
+	begin := s.uploadFilesMetrics.Begin()
+	defer func() { s.uploadFilesMetrics.End(begin, err != nil, requestBytes, replyBytes) }()
 
 	span := trace.SpanFromContext(ctx)
 	if span.SpanContext().IsValid() {
 		// Create a child span for this method.
-		ctx, span = s.stub.Tracer().Start(ctx, "submission.SubmissionService.UploadOutputAndSourceCode", trace.WithSpanKind(trace.SpanKindClient))
+		ctx, span = s.stub.Tracer().Start(ctx, "submission.SubmissionService.UploadFiles", trace.WithSpanKind(trace.SpanKindClient))
 	}
 
 	defer func() {
@@ -434,7 +434,6 @@ func (s submissionService_client_stub) UploadOutputAndSourceCode(ctx context.Con
 
 	// Decode the results.
 	dec := codegen.NewDecoder(results)
-	r0 = dec.String()
 	err = dec.Error()
 	return
 }
@@ -483,8 +482,8 @@ func (s submissionService_server_stub) GetStubFn(method string) func(ctx context
 		return s.getById
 	case "Update":
 		return s.update
-	case "UploadOutputAndSourceCode":
-		return s.uploadOutputAndSourceCode
+	case "UploadFiles":
+		return s.uploadFiles
 	default:
 		return nil
 	}
@@ -592,7 +591,7 @@ func (s submissionService_server_stub) update(ctx context.Context, args []byte) 
 	return enc.Data(), nil
 }
 
-func (s submissionService_server_stub) uploadOutputAndSourceCode(ctx context.Context, args []byte) (res []byte, err error) {
+func (s submissionService_server_stub) uploadFiles(ctx context.Context, args []byte) (res []byte, err error) {
 	// Catch and return any panics detected during encoding/decoding/rpc.
 	defer func() {
 		if err == nil {
@@ -612,11 +611,10 @@ func (s submissionService_server_stub) uploadOutputAndSourceCode(ctx context.Con
 	// TODO(rgrandl): The deferred function above will recover from panics in the
 	// user code: fix this.
 	// Call the local method.
-	r0, appErr := s.impl.UploadOutputAndSourceCode(ctx, a0, a1, a2)
+	appErr := s.impl.UploadFiles(ctx, a0, a1, a2)
 
 	// Encode the results.
 	enc := codegen.NewEncoder()
-	enc.String(r0)
 	enc.Error(appErr)
 	return enc.Data(), nil
 }
@@ -650,8 +648,8 @@ func (s submissionService_reflect_stub) Update(ctx context.Context, a0 *domain.S
 	return
 }
 
-func (s submissionService_reflect_stub) UploadOutputAndSourceCode(ctx context.Context, a0 string, a1 []byte, a2 []byte) (r0 string, err error) {
-	err = s.caller("UploadOutputAndSourceCode", ctx, []any{a0, a1, a2}, []any{&r0})
+func (s submissionService_reflect_stub) UploadFiles(ctx context.Context, a0 string, a1 []byte, a2 []byte) (err error) {
+	err = s.caller("UploadFiles", ctx, []any{a0, a1, a2}, []any{})
 	return
 }
 

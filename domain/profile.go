@@ -11,5 +11,6 @@ type Profile struct {
 	Email         string    `json:"email"`
 	FullName      string    `json:"full_name"`
 	AvatarUrl     string    `json:"avatar_url"`
+	AccessLevel   int8      `json:"access_level"`
 	LinkedDevPass string    `json:"linked_dev_pass"`
 }

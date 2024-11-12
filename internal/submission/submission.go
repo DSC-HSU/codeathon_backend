@@ -16,7 +16,7 @@ type SubmissionService interface {
 	GetById(ctx context.Context, id string) (*domain.Submission, error)
 	Create(ctx context.Context, submission *domain.Submission) error
 	Update(ctx context.Context, submission *domain.Submission) error
-	UploadOutputAndSourceCode(ctx context.Context, submissionId string, outputFile []byte, sourceCode []byte) (string, error)
+	UploadFiles(ctx context.Context, submissionId string, sourceCode []byte, outputFile []byte) error
 }
 
 type submissionService struct {
@@ -37,46 +37,54 @@ func (s submissionService) GetById(ctx context.Context, id string) (*domain.Subm
 	return submission, nil
 }
 
-func (s submissionService) UploadOutputAndSourceCode(ctx context.Context, submissionId string, outputFile []byte, sourceCode []byte) (string, error) {
+func (s submissionService) UploadFiles(ctx context.Context, submissionId string, sourceCode []byte, outputFile []byte) error {
+	var url string
 	// Upload file to storage
-	fileData := bytes.NewReader(outputFile) // assuming `file` is a byte slice
-	fileResponse, err := supabase.Client.Storage.UploadFile("output-files", uuid.New().String(), fileData)
+	fileData := bytes.NewReader(sourceCode) // assuming `file` is a byte slice
+	filename := uuid.New().String()
+	fileResponse, err := supabase.Client.Storage.UploadFile("source-code-files", filename, fileData)
 	if err != nil {
-		return "", err
+		return err
 	}
 
 	// Get the URL of the uploaded file
 	fileUrl := fileResponse.Key
 
+	// Remove source-code-files/ in fileUrl
+	url = fileUrl[18:]
 	// Retrieve the existing submission
 	submission, err := s.GetById(ctx, submissionId)
 	if err != nil {
-		return "", err
+		return err
 	}
 
-	// Update the output_file_urls field
-	submission.OutputFileUrls = fileUrl[13:]
+	// Concatenate the new URLs with the existing URLs
+	submission.SourceCodeUrl = url
 
-	// Upload source code
-	fileData = bytes.NewReader(sourceCode) // assuming `file` is a byte slice
-	fileResponse, err = supabase.Client.Storage.UploadFile("source-code", uuid.New().String(), fileData)
+	// upload output file
+	fileData = bytes.NewReader(outputFile) // assuming `file` is a byte slice
+	filename = uuid.New().String()
+	fileResponse, err = supabase.Client.Storage.UploadFile("output-files", filename, fileData)
 	if err != nil {
-		return "", err
+		return err
 	}
 
 	// Get the URL of the uploaded file
 	fileUrl = fileResponse.Key
 
-	// Update the source_code_url field
-	submission.SourceCodeUrls = fileUrl[13:]
+	// Remove output-files/ in fileUrl
+	url = fileUrl[13:]
+
+	// Concatenate the new URLs with the existing URLs
+	submission.OutputFileUrl = url
 
 	// Save the updated submission back to the database
 	err = s.Update(ctx, submission)
 	if err != nil {
-		return "", err
+		return err
 	}
 
-	return fileUrl, nil
+	return nil
 }
 
 func (s submissionService) GetByChallengeIdAndUserId(ctx context.Context, userId string, challengeId string, opts *domain.ListOpts) (*domain.ListResult[*domain.Submission], error) {

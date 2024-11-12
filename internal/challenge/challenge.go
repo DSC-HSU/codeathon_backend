@@ -22,7 +22,8 @@ type ChallengeService interface {
 	Update(ctx context.Context, challenge *domain.Challenge) error
 	Delete(ctx context.Context, id string) error
 	Scoring(ctx context.Context, submission *domain.Submission) (*domain.SubmitResult, error)
-	UploadEvalScript(ctx context.Context, challengeId string, file []byte) (string, error)
+	UploadEvalScript(ctx context.Context, challengeId string, file []byte) error
+	UploadInputFiles(ctx context.Context, challengeId string, files [][]byte) error
 }
 
 type challengeService struct {
@@ -30,13 +31,13 @@ type challengeService struct {
 	submissionService weaver.Ref[submission.SubmissionService]
 }
 
-func (c challengeService) UploadEvalScript(ctx context.Context, challengeId string, file []byte) (string, error) {
+func (c challengeService) UploadEvalScript(ctx context.Context, challengeId string, file []byte) error {
 	// Upload file to storage
 	fileData := bytes.NewReader(file) // assuming `file` is a byte slice
-	filename := uuid.New().String() + ".js"
+	filename := uuid.New().String()
 	fileResponse, err := supabase.Client.Storage.UploadFile("eval-scripts", filename, fileData)
 	if err != nil {
-		return "", err
+		return err
 	}
 
 	// Get the URL of the uploaded file
@@ -45,7 +46,7 @@ func (c challengeService) UploadEvalScript(ctx context.Context, challengeId stri
 	// Retrieve the existing challenge
 	challenge, err := c.GetById(ctx, challengeId)
 	if err != nil {
-		return "", err
+		return err
 	}
 
 	// how to remove eval-scripts/ in fileUrl
@@ -54,10 +55,48 @@ func (c challengeService) UploadEvalScript(ctx context.Context, challengeId stri
 	// Save the updated challenge back to the database
 	err = c.Update(ctx, challenge)
 	if err != nil {
-		return "", err
+		return err
 	}
 
-	return fileUrl, nil
+	return nil
+}
+
+func (c challengeService) UploadInputFiles(ctx context.Context, challengeId string, files [][]byte) error {
+	var urls []string
+	for _, file := range files {
+		// Upload file to storage
+		fileData := bytes.NewReader(file) // assuming `file` is a byte slice
+		filename := uuid.New().String()
+		fileResponse, err := supabase.Client.Storage.UploadFile("input-files", filename, fileData)
+		if err != nil {
+			return err
+		}
+
+		// Get the URL of the uploaded file
+		fileUrl := fileResponse.Key
+
+		// Remove input-files/ in fileUrl
+		fileUrl = fileUrl[12:]
+
+		urls = append(urls, fileUrl)
+	}
+
+	// Retrieve the existing challenge
+	challenge, err := c.GetById(ctx, challengeId)
+	if err != nil {
+		return err
+	}
+
+	// Concatenate the new URLs with the existing URLs
+	challenge.InputFileUrls = append(challenge.InputFileUrls, urls...)
+
+	// Save the updated challenge back to the database
+	err = c.Update(ctx, challenge)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (c challengeService) GetById(ctx context.Context, id string) (*domain.Challenge, error) {
@@ -112,25 +151,42 @@ func (c challengeService) Scoring(ctx context.Context, submission *domain.Submis
 		return nil, err
 	}
 
+	// Get eval script from storage
 	file, err := supabase.Client.Storage.DownloadFile("eval-scripts", strings.TrimSpace(challenge.EvalScript))
 	if err != nil {
 		return nil, err
 	}
 	data := string(file)
 
-	// Get output file  from storage
-	submissionFile, err := supabase.Client.Storage.DownloadFile("output-files", strings.TrimSpace(submission.OutputFileUrls))
+	// Get input files from storage
+	var input string
+	inputFile, err := supabase.Client.Storage.DownloadFile("input-files", challenge.InputFileUrls[submission.InputFileId])
 	if err != nil {
 		return nil, err
 	}
-	output := string(submissionFile)
+	input = string(inputFile)
 
-	v8ctx := v8.NewContext() // tạo ngữ cảnh mới cho V8
-
-	// Thiết lập biến `fileContent` trong JavaScript bằng nội dung `input`
-	_, err = v8ctx.RunScript(fmt.Sprintf("var fileContent = `%s`;", output), "output.js")
+	// Get output files from storage
+	var output string
+	outputFile, err := supabase.Client.Storage.DownloadFile("output-files", submission.OutputFileUrl)
 	if err != nil {
-		fmt.Println("Lỗi thiết lập input cho JavaScript:", err)
+		return nil, err
+	}
+	output = string(outputFile)
+
+	v8ctx := v8.NewContext() // create a new V8 context
+
+	// Set the `fileContent` variable in JavaScript with the content of `output`
+	_, err = v8ctx.RunScript(fmt.Sprintf("var output = `%s`;", output), "output.js")
+	if err != nil {
+		fmt.Println("Error setting input for JavaScript:", err)
+		return nil, err
+	}
+
+	// Set the `fileContent` variable in JavaScript with the content of `input`
+	_, err = v8ctx.RunScript(fmt.Sprintf("var input = `%s`;", input), "input.js")
+	if err != nil {
+		fmt.Println("Error setting input for JavaScript:", err)
 		return nil, err
 	}
 

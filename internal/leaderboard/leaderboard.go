@@ -54,7 +54,7 @@ func (l leaderboardService) GetByCId(ctx context.Context, cId string, listOpts *
 		"offset_value": listOpts.Offset,
 		"limit_value":  listOpts.Limit,
 	})
-
+	fmt.Println(str)
 	var leaderboard []*Leaderboard
 	err = json.Unmarshal([]byte(str), &leaderboard)
 	if err != nil {

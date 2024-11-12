@@ -178,7 +178,7 @@ func Api(service ChallengeService) {
 		c.JSON(200, result)
 	})
 
-	// upload input file
+	// upload eval script
 	r.POST("/challenge/:id/eval-script", func(c *gin.Context) {
 		id := c.Param("id")
 
@@ -191,7 +191,7 @@ func Api(service ChallengeService) {
 		}
 
 		// Extract the file from the request
-		file, err := c.FormFile("file")
+		file, err := c.FormFile("eval_script")
 		if err != nil {
 			c.JSON(400, gin.H{
 				"message": "Failed to retrieve file: " + err.Error(),
@@ -219,7 +219,7 @@ func Api(service ChallengeService) {
 		}
 
 		// Upload the file to the challenge
-		fileUrl, err := service.UploadEvalScript(c, id, fileBytes)
+		err = service.UploadEvalScript(c, id, fileBytes)
 		if err != nil {
 			c.JSON(400, gin.H{
 				"message": "Failed to upload file: " + err.Error(),
@@ -229,9 +229,82 @@ func Api(service ChallengeService) {
 
 		// Return the URL of the uploaded file
 		c.JSON(200, gin.H{
-			"url": fileUrl,
+			"message": "File uploaded successfully",
 		})
 
+	})
+
+	// upload with many input files
+	r.POST("/challenge/:id/input-files", func(c *gin.Context) {
+		id := c.Param("id")
+
+		// Check if 'id' is a valid UUID
+		if _, err := uuid.Parse(id); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "Invalid ID format, expected UUID",
+			})
+			return
+		}
+
+		// Extract the files from the request
+		form, err := c.MultipartForm()
+		if err != nil {
+			c.JSON(400, gin.H{
+				"message": "Failed to retrieve files: " + err.Error(),
+			})
+			return
+		}
+
+		// Get the files from the form
+		files := form.File["files"]
+
+		// Check if there are any files
+		if len(files) == 0 {
+			c.JSON(400, gin.H{
+				"message": "No files found",
+			})
+			return
+		}
+
+		// Iterate over the files
+		var fileContents [][]byte
+		for _, file := range files {
+			// Open the uploaded file
+			fileContent, err := file.Open()
+			if err != nil {
+				c.JSON(400, gin.H{
+					"message": "Failed to open file: " + err.Error(),
+				})
+				return
+			}
+			defer fileContent.Close()
+
+			// Read the content of the file into a byte slice
+			fileBytes, err := io.ReadAll(fileContent)
+			if err != nil {
+				c.JSON(400, gin.H{
+					"message": "Failed to read file: " + err.Error(),
+				})
+				return
+			}
+
+			// Append the file content to the slice
+			fileContents = append(fileContents, fileBytes)
+		}
+
+		// Upload the files to the challenge
+		err = service.UploadInputFiles(c, id, fileContents)
+		if err != nil {
+			c.JSON(400, gin.H{
+				"message": "Failed to upload files: " + err.Error(),
+			})
+			return
+		}
+
+		// Return the URLs of the uploaded files
+		c.JSON(200, gin.H{
+			"message": "Files uploaded successfully",
+		})
 	})
 
 }

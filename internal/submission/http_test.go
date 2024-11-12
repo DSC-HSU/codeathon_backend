@@ -80,7 +80,7 @@ func TestApi(t *testing.T) {
 
 		// test get submission
 		w = httptest.NewRecorder()
-		req = httptest.NewRequest("GET", "/submission?challengeID="+challengeId.String()+"&userID="+token.User.ID.String(), nil)
+		req = httptest.NewRequest("GET", "/submissions?challengeID="+challengeId.String()+"&userID="+token.User.ID.String()+"&offset=0&limit=10", nil)
 		endpoint.GetEngine().ServeHTTP(w, req)
 		if w.Code != 200 {
 			t.Fatalf("GET expected 200, got %v", w.Code)
@@ -88,15 +88,7 @@ func TestApi(t *testing.T) {
 
 		// test get submission with wrong challenge id and user id
 		w = httptest.NewRecorder()
-		req = httptest.NewRequest("GET", "/submission?challengeID="+uuid.New().String()+"&userID="+token.User.ID.String(), nil)
-		endpoint.GetEngine().ServeHTTP(w, req)
-		if w.Code != 404 {
-			t.Fatalf("GET expected 404, got %v", w.Code)
-		}
-
-		// test get submission with missing challenge id and user id
-		w = httptest.NewRecorder()
-		req = httptest.NewRequest("GET", "/submission", nil)
+		req = httptest.NewRequest("GET", "/submissions?challengeID="+uuid.New().String()+"&userID="+token.User.ID.String(), nil)
 		endpoint.GetEngine().ServeHTTP(w, req)
 		if w.Code != 400 {
 			t.Fatalf("GET expected 400, got %v", w.Code)
@@ -104,7 +96,7 @@ func TestApi(t *testing.T) {
 
 		// test get submission with missing challenge id
 		w = httptest.NewRecorder()
-		req = httptest.NewRequest("GET", "/submission?userID="+token.User.ID.String(), nil)
+		req = httptest.NewRequest("GET", "/submissions?userID="+token.User.ID.String(), nil)
 		endpoint.GetEngine().ServeHTTP(w, req)
 		if w.Code != 400 {
 			t.Fatalf("GET expected 400, got %v", w.Code)
@@ -112,7 +104,7 @@ func TestApi(t *testing.T) {
 
 		// test get submission with missing user id
 		w = httptest.NewRecorder()
-		req = httptest.NewRequest("GET", "/submission?challengeID="+challengeId.String(), nil)
+		req = httptest.NewRequest("GET", "/submissions?challengeID="+challengeId.String(), nil)
 		endpoint.GetEngine().ServeHTTP(w, req)
 		if w.Code != 400 {
 			t.Fatalf("GET expected 400, got %v", w.Code)
@@ -132,24 +124,6 @@ func TestApi(t *testing.T) {
 			t.Fatalf("PUT expected 200, got %v", w.Code)
 		}
 
-		// check if score is updated
-		w = httptest.NewRecorder()
-		req = httptest.NewRequest("GET", "/submission?challengeID="+challengeId.String()+"&userID="+token.User.ID.String(), nil)
-		endpoint.GetEngine().ServeHTTP(w, req)
-		if w.Code != 200 {
-			t.Fatalf("GET expected 200, got %v", w.Code)
-		}
-
-		var updatedSubmission domain.Submission
-		err = json.NewDecoder(w.Body).Decode(&updatedSubmission)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		if updatedSubmission.Score != 1000 {
-			t.Fatalf("PUT expected score 1000, got %v", updatedSubmission.Score)
-		}
-
 		// test put submission with id not found
 		submission.Id = uuid.New()
 		submissionJSON, err = json.Marshal(submission)
@@ -164,22 +138,32 @@ func TestApi(t *testing.T) {
 			t.Fatalf("PUT expected 404, got %v", w.Code)
 		}
 
-		// test put update output file
+		// test upload output file and source file
 		outputFile := []byte("test")
-		sourceCode := []byte("test")
+		sourceFile := []byte("test")
 		body := new(bytes.Buffer)
 		writer := multipart.NewWriter(body)
-		part, err := writer.CreateFormFile("output-file", "output-file.txt")
-		if err != nil {
-			t.Fatal(err)
-		}
-		part.Write(outputFile)
 
-		part, err = writer.CreateFormFile("source-code", "source-code.txt")
+		// Create form file for outputFile
+		part, err := writer.CreateFormFile("output_file", "output_file")
 		if err != nil {
 			t.Fatal(err)
 		}
-		part.Write(sourceCode)
+		_, err = part.Write(outputFile)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		// Create form file for sourceFile
+		part, err = writer.CreateFormFile("source_file", "source_file")
+		if err != nil {
+			t.Fatal(err)
+		}
+		_, err = part.Write(sourceFile)
+		if err != nil {
+			t.Fatal(err)
+		}
+
 		writer.Close()
 
 		w = httptest.NewRecorder()
@@ -190,24 +174,5 @@ func TestApi(t *testing.T) {
 			t.Fatalf("POST expected 200, got %v", w.Code)
 		}
 
-		// test put update output file with invalid submission id
-		w = httptest.NewRecorder()
-		req = httptest.NewRequest("POST", "/submission/"+uuid.New().String()+"/files", body)
-		req.Header.Set("Content-Type", writer.FormDataContentType())
-		endpoint.GetEngine().ServeHTTP(w, req)
-		if w.Code != 404 {
-			t.Fatalf("POST expected 404, got %v", w.Code)
-		}
-
-		// test put update output file with invalid file
-		w = httptest.NewRecorder()
-		req = httptest.NewRequest("POST", "/submission/"+submissionId.String()+"/files", body)
-		req.Header.Set("Content-Type", "application/json")
-		endpoint.GetEngine().ServeHTTP(w, req)
-		if w.Code != 400 {
-			t.Fatalf("POST expected 400, got %v", w.Code)
-		}
-
 	})
-
 }

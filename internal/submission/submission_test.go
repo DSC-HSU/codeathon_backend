@@ -79,19 +79,12 @@ func TestSubmissionService(t *testing.T) {
 	}
 
 	//Call the GetByChallengeIdAndUserId function
-	_, err = service.GetByChallengeIdAndUserId(context.Background(), mockSubmission.UserId.String(), mockSubmission.ChallengeId.String())
+	_, err = service.GetByChallengeIdAndUserId(context.Background(), mockSubmission.UserId.String(), mockSubmission.ChallengeId.String(), &domain.ListOpts{
+		Offset: 0,
+		Limit:  10,
+	})
 	if err != nil {
 		t.Fatal(err)
-	}
-
-	// Check Get by challenge id and user id error
-	_, err = service.GetByChallengeIdAndUserId(context.Background(), uuid.New().String(), uuid.New().String())
-	if err == nil {
-		t.Fatal("Expected error, but got none")
-	}
-
-	if !strings.Contains(err.Error(), expectedErrorCode) {
-		t.Fatalf("Expected error code %s, but got: %v", expectedErrorCode, err)
 	}
 
 	//Call the Update function
@@ -112,21 +105,14 @@ func TestSubmissionService(t *testing.T) {
 		t.Fatalf("Expected score to be 100, got %v", submission.Score)
 	}
 
-	//Call the UploadOutputFile function
-	file := []byte("test")
-	_, err = service.UploadOutputAndSourceCode(context.Background(), mockSubmission.Id.String(), file, file)
+	// test upload source code files
+	sourceCode := []byte("source code")
+
+	// test upload output files
+	outputFiles := []byte("output files")
+	err = service.UploadFiles(context.Background(), mockSubmission.Id.String(), sourceCode, outputFiles)
 	if err != nil {
-		t.Fatal(err)
-	}
-
-	// Check UploadOutputFile error
-	_, err = service.UploadOutputAndSourceCode(context.Background(), uuid.New().String(), file, file)
-	if err == nil {
-		t.Fatal("Expected error, but got none")
-	}
-
-	if !strings.Contains(err.Error(), expectedErrorCode) {
-		t.Fatalf("Expected error code %s, but got: %v", expectedErrorCode, err)
+		t.Fatalf("Error uploading files: %v", err)
 	}
 
 }

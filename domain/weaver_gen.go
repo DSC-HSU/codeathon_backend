@@ -52,11 +52,13 @@ var _ codegen.AutoMarshal = (*Challenge)(nil)
 
 type __is_Challenge[T ~struct {
 	weaver.AutoMarshal
-	Id          uuid.UUID "json:\"id\""
-	Title       string    "json:\"title\""
-	Description string    "json:\"description\""
-	Statement   string    "json:\"statement\""
-	EvalScript  string    "json:\"eval_script\""
+	Id            uuid.UUID "json:\"id\""
+	Title         string    "json:\"title\""
+	Description   string    "json:\"description\""
+	Statement     string    "json:\"statement\""
+	StartDateTime time.Time "json:\"start_date_time\""
+	EvalScript    string    "json:\"eval_script\""
+	InputFileUrls []string  "json:\"input_file_urls\""
 }] struct{}
 
 var _ __is_Challenge[Challenge]
@@ -69,7 +71,9 @@ func (x *Challenge) WeaverMarshal(enc *codegen.Encoder) {
 	enc.String(x.Title)
 	enc.String(x.Description)
 	enc.String(x.Statement)
+	enc.EncodeBinaryMarshaler(&x.StartDateTime)
 	enc.String(x.EvalScript)
+	serviceweaver_enc_slice_string_4af10117(enc, x.InputFileUrls)
 }
 
 func (x *Challenge) WeaverUnmarshal(dec *codegen.Decoder) {
@@ -80,7 +84,32 @@ func (x *Challenge) WeaverUnmarshal(dec *codegen.Decoder) {
 	x.Title = dec.String()
 	x.Description = dec.String()
 	x.Statement = dec.String()
+	dec.DecodeBinaryUnmarshaler(&x.StartDateTime)
 	x.EvalScript = dec.String()
+	x.InputFileUrls = serviceweaver_dec_slice_string_4af10117(dec)
+}
+
+func serviceweaver_enc_slice_string_4af10117(enc *codegen.Encoder, arg []string) {
+	if arg == nil {
+		enc.Len(-1)
+		return
+	}
+	enc.Len(len(arg))
+	for i := 0; i < len(arg); i++ {
+		enc.String(arg[i])
+	}
+}
+
+func serviceweaver_dec_slice_string_4af10117(dec *codegen.Decoder) []string {
+	n := dec.Len()
+	if n == -1 {
+		return nil
+	}
+	res := make([]string, n)
+	for i := 0; i < n; i++ {
+		res[i] = dec.String()
+	}
+	return res
 }
 
 var _ codegen.AutoMarshal = (*Config)(nil)
@@ -233,6 +262,7 @@ type __is_Profile[T ~struct {
 	Email         string    "json:\"email\""
 	FullName      string    "json:\"full_name\""
 	AvatarUrl     string    "json:\"avatar_url\""
+	AccessLevel   int8      "json:\"access_level\""
 	LinkedDevPass string    "json:\"linked_dev_pass\""
 }] struct{}
 
@@ -246,6 +276,7 @@ func (x *Profile) WeaverMarshal(enc *codegen.Encoder) {
 	enc.String(x.Email)
 	enc.String(x.FullName)
 	enc.String(x.AvatarUrl)
+	enc.Int8(x.AccessLevel)
 	enc.String(x.LinkedDevPass)
 }
 
@@ -257,6 +288,7 @@ func (x *Profile) WeaverUnmarshal(dec *codegen.Decoder) {
 	x.Email = dec.String()
 	x.FullName = dec.String()
 	x.AvatarUrl = dec.String()
+	x.AccessLevel = dec.Int8()
 	x.LinkedDevPass = dec.String()
 }
 
@@ -264,13 +296,14 @@ var _ codegen.AutoMarshal = (*Submission)(nil)
 
 type __is_Submission[T ~struct {
 	weaver.AutoMarshal
-	Id             uuid.UUID "json:\"id\""
-	ChallengeId    uuid.UUID "json:\"challenge_id\""
-	UserId         uuid.UUID "json:\"user_id\""
-	OutputFileUrls string    "json:\"output_file_urls\""
-	SourceCodeUrls string    "json:\"source_code_urls\""
-	Score          float64   "json:\"score\""
-	RankScore      float64   "json:\"rank_score\""
+	Id            uuid.UUID "json:\"id\""
+	ChallengeId   uuid.UUID "json:\"challenge_id\""
+	UserId        uuid.UUID "json:\"user_id\""
+	OutputFileUrl string    "json:\"output_file_url\""
+	SourceCodeUrl string    "json:\"source_code_url\""
+	InputFileId   int16     "json:\"input_file_id\""
+	Score         float64   "json:\"score\""
+	RankScore     float64   "json:\"rank_score\""
 }] struct{}
 
 var _ __is_Submission[Submission]
@@ -282,8 +315,9 @@ func (x *Submission) WeaverMarshal(enc *codegen.Encoder) {
 	enc.EncodeBinaryMarshaler(&x.Id)
 	enc.EncodeBinaryMarshaler(&x.ChallengeId)
 	enc.EncodeBinaryMarshaler(&x.UserId)
-	enc.String(x.OutputFileUrls)
-	enc.String(x.SourceCodeUrls)
+	enc.String(x.OutputFileUrl)
+	enc.String(x.SourceCodeUrl)
+	enc.Int16(x.InputFileId)
 	enc.Float64(x.Score)
 	enc.Float64(x.RankScore)
 }
@@ -295,8 +329,9 @@ func (x *Submission) WeaverUnmarshal(dec *codegen.Decoder) {
 	dec.DecodeBinaryUnmarshaler(&x.Id)
 	dec.DecodeBinaryUnmarshaler(&x.ChallengeId)
 	dec.DecodeBinaryUnmarshaler(&x.UserId)
-	x.OutputFileUrls = dec.String()
-	x.SourceCodeUrls = dec.String()
+	x.OutputFileUrl = dec.String()
+	x.SourceCodeUrl = dec.String()
+	x.InputFileId = dec.Int16()
 	x.Score = dec.Float64()
 	x.RankScore = dec.Float64()
 }

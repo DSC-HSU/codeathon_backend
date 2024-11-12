@@ -54,52 +54,62 @@ func TestLeaderBoardService(t *testing.T) {
 	// create dummy submissions
 	dummySubmissionData := &[]*domain.Submission{
 		&domain.Submission{
+			Id:          uuid.New(),
 			ChallengeId: challengeId1,
 			UserId:      uuid.New(),
 			Score:       10,
 		},
 		&domain.Submission{
+			Id:          uuid.New(),
 			ChallengeId: challengeId1,
 			UserId:      uuid.New(),
 			Score:       73,
 		},
 		&domain.Submission{
+			Id:          uuid.New(),
 			ChallengeId: challengeId1,
 			UserId:      uuid.New(),
 			Score:       100,
 		},
 		&domain.Submission{
+			Id:          uuid.New(),
 			ChallengeId: challengeId1,
 			UserId:      uuid.New(),
 			Score:       50,
 		},
 		&domain.Submission{
+			Id:          uuid.New(),
 			ChallengeId: challengeId1,
 			UserId:      uuid.New(),
 			Score:       90,
 		},
 		// change challenge id
 		&domain.Submission{
+			Id:          uuid.New(),
 			ChallengeId: challengeId2,
 			UserId:      uuid.New(),
 			Score:       10,
 		},
 		&domain.Submission{
+			Id:          uuid.New(),
 			ChallengeId: challengeId2,
 			UserId:      uuid.New(),
 			Score:       73,
 		},
 		&domain.Submission{
+			Id:          uuid.New(),
 			ChallengeId: challengeId2,
 			UserId:      uuid.New(),
 			Score:       100,
 		},
 		&domain.Submission{
+			Id:          uuid.New(),
 			ChallengeId: challengeId2,
 			UserId:      uuid.New(),
 			Score:       50,
 		},
 		&domain.Submission{
+			Id:          uuid.New(),
 			ChallengeId: challengeId2,
 			UserId:      uuid.New(),
 			Score:       90,
@@ -139,15 +149,15 @@ func TestLeaderBoardService(t *testing.T) {
 	}
 
 	// test get global
-	leaderboard, err = service.GetGlobal(context.Background(), &domain.ListOpts{Offset: 0, Limit: 5})
+	globalLeaderboard, err := service.GetGlobal(context.Background(), &domain.ListOpts{Offset: 0, Limit: 5})
 	if err != nil {
 		t.Fatal(err)
 	}
-	if leaderboard == nil {
+	if globalLeaderboard == nil {
 		t.Fatal("leaderboard is nil")
 	}
-	if len(leaderboard.Data) != 5 {
-		t.Fatalf("expected 5, got %v", len(leaderboard.Data))
+	if len(globalLeaderboard.Data) != 5 {
+		t.Fatalf("expected 5, got %v", len(globalLeaderboard.Data))
 	}
-	fmt.Printf("%v", leaderboard)
+	fmt.Printf("%v", globalLeaderboard)
 }

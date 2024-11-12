@@ -13,6 +13,7 @@ import (
 	"github.com/google/uuid"
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestChallengeService(t *testing.T) {
@@ -48,9 +49,10 @@ func TestChallengeService(t *testing.T) {
 
 	// Create a  challenge
 	mockChallenge := &domain.Challenge{
-		Id:          uuid.New(),
-		Title:       "Test Challenge",
-		Description: "This is a test challenge",
+		Id:            uuid.New(),
+		Title:         "Test Challenge",
+		Description:   "This is a test challenge",
+		StartDateTime: time.Date(2021, time.September, 1, 0, 0, 0, 0, time.UTC),
 	}
 
 	//Call the Create function
@@ -127,9 +129,18 @@ func TestChallengeService(t *testing.T) {
 
 	// Test post eval script
 	fileData := []byte("console.log('Hello World')")
-	_, err = service.UploadEvalScript(context.Background(), mockChallenge.Id.String(), fileData)
+	err = service.UploadEvalScript(context.Background(), mockChallenge.Id.String(), fileData)
 	if err != nil {
 		t.Fatal(err)
+	}
+
+	// Test post array of input files
+	fileData1 := []byte("console.log('Hello World')")
+	fileData2 := []byte("console.log('Hello World')")
+	files := [][]byte{fileData1, fileData2}
+	err = service.UploadInputFiles(context.Background(), mockChallenge.Id.String(), files)
+	if err != nil {
+		t.Fatalf("Error uploading input files: %v", err)
 	}
 
 	//Delete the challenge
