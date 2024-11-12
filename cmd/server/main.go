@@ -38,7 +38,7 @@ type app struct {
 	challengeService   weaver.Ref[challenge.ChallengeService]
 	submissionService  weaver.Ref[submission.SubmissionService]
 	leaderboardService weaver.Ref[leaderboard.LeaderboardService]
-	listener           weaver.Listener
+	listener           weaver.Listener `weaver:"server"`
 }
 
 func serve(ctx context.Context, app *app) error {

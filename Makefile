@@ -17,7 +17,7 @@ start-rabbitmq:
 
 dev-start:
 	weaver generate ./...
-	go run ./cmd/server
+	SERVICEWEAVER_CONFIG=weaver.toml go run ./cmd/server
 
 save-dev-data:
 	supabase db pull --schema auth,storage --local
