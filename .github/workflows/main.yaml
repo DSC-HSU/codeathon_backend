@@ -1,0 +1,65 @@
+name: CI/CD Pipeline for Service Weaver
+
+on:
+    workflow_dispatch:
+        branches:
+            - main
+    push:
+        branches:
+            - master
+    pull_request:
+        branches:
+            - master
+
+jobs:
+    build-and-deploy:
+        runs-on: self-hosted
+
+        steps:
+            -   name: Check out code
+                uses: actions/checkout@v3
+
+            -   name: Set up Go
+                uses: actions/setup-go@v4
+                with:
+                    go-version: '1.23'
+
+            -   name: Set up Go environment variables
+                run: |
+                    # Define HOME explicitly if missing
+                    export HOME=${HOME:-/home/runner}
+                    export GOPATH=$HOME/go
+                    export GOMODCACHE=$GOPATH/pkg/mod
+                    export GOCACHE=$GOPATH/.cache/go-build
+                    echo "HOME=$HOME" >> $GITHUB_ENV
+                    echo "GOPATH=$GOPATH" >> $GITHUB_ENV
+                    echo "GOMODCACHE=$GOMODCACHE" >> $GITHUB_ENV
+                    echo "GOCACHE=$GOCACHE" >> $GITHUB_ENV
+                    # Add GOPATH/bin to PATH
+                    echo "PATH=$GOPATH/bin:$PATH" >> $GITHUB_ENV
+
+            -   name: Install Service Weaver CLI
+                run: |
+                    go mod tidy
+                    go install github.com/ServiceWeaver/weaver/cmd/weaver@latest
+                    go install github.com/ServiceWeaver/weaver-kube/cmd/weaver-kube@latest
+                shell: bash
+
+            -   name: Build Service Weaver application
+                run: weaver kube deploy config.yaml
+                shell: bash
+
+            -   name: Log in to Docker Hub
+                uses: docker/login-action@v2
+                with:
+                    username: ${{ secrets.DOCKER_USERNAME }}
+                    password: ${{ secrets.DOCKER_PASSWORD }}
+
+            -   name: Deploy to Kubernetes
+                run: |
+                    echo "${{ secrets.KUBECONFIG_DATA }}" | base64 --decode > $HOME/.kube/config
+                    weaver kube deploy dep_config.yaml
+                    kubectl apply -f /tmp/kube_*.yaml
+                env:
+                    KUBECONFIG: $HOME/.kube/config
+                shell: bash
