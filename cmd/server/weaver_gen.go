@@ -16,7 +16,7 @@ func init() {
 		Name:      "github.com/ServiceWeaver/weaver/Main",
 		Iface:     reflect.TypeOf((*weaver.Main)(nil)).Elem(),
 		Impl:      reflect.TypeOf(app{}),
-		Listeners: []string{"listener"},
+		Listeners: []string{"server"},
 		LocalStubFn: func(impl any, caller string, tracer trace.Tracer) any {
 			return main_local_stub{impl: impl.(weaver.Main), tracer: tracer}
 		},
@@ -27,7 +27,7 @@ func init() {
 		ReflectStubFn: func(caller func(string, context.Context, []any, []any) error) any {
 			return main_reflect_stub{caller: caller}
 		},
-		RefData: "⟦a69afd87:wEaVeReDgE:github.com/ServiceWeaver/weaver/Main→codeathon.runwayclub.dev/internal/profile/ProfileService⟧\n⟦c44ce678:wEaVeReDgE:github.com/ServiceWeaver/weaver/Main→codeathon.runwayclub.dev/internal/challenge/ChallengeService⟧\n⟦ba9d3377:wEaVeReDgE:github.com/ServiceWeaver/weaver/Main→codeathon.runwayclub.dev/internal/submission/SubmissionService⟧\n⟦4a7a4118:wEaVeReDgE:github.com/ServiceWeaver/weaver/Main→codeathon.runwayclub.dev/internal/leaderboard/LeaderboardService⟧\n⟦2248fb79:wEaVeRlIsTeNeRs:github.com/ServiceWeaver/weaver/Main→listener⟧\n",
+		RefData: "⟦a69afd87:wEaVeReDgE:github.com/ServiceWeaver/weaver/Main→codeathon.runwayclub.dev/internal/profile/ProfileService⟧\n⟦c44ce678:wEaVeReDgE:github.com/ServiceWeaver/weaver/Main→codeathon.runwayclub.dev/internal/challenge/ChallengeService⟧\n⟦ba9d3377:wEaVeReDgE:github.com/ServiceWeaver/weaver/Main→codeathon.runwayclub.dev/internal/submission/SubmissionService⟧\n⟦4a7a4118:wEaVeReDgE:github.com/ServiceWeaver/weaver/Main→codeathon.runwayclub.dev/internal/leaderboard/LeaderboardService⟧\n⟦63277f23:wEaVeRlIsTeNeRs:github.com/ServiceWeaver/weaver/Main→server⟧\n",
 	})
 }
 
@@ -105,4 +105,3 @@ type main_reflect_stub struct {
 
 // Check that main_reflect_stub implements the weaver.Main interface.
 var _ weaver.Main = (*main_reflect_stub)(nil)
-
