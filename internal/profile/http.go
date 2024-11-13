@@ -11,7 +11,7 @@ import (
 func Api(service ProfileService) {
 	r := endpoint.GetEngine()
 	r.GET("/profiles", func(c *gin.Context) {
-		var limit, offset int
+		var limit, offset, accessLevel int
 		var err error
 
 		// Kiểm tra xem người dùng có cung cấp limit và offset không
@@ -43,8 +43,23 @@ func Api(service ProfileService) {
 			return
 		}
 
+		// Kiểm tra xem người dùng có cung cấp access_level không
+		if al := c.Query("accessLevel"); al != "" {
+			if accessLevel, err = strconv.Atoi(al); err != nil {
+				c.JSON(400, gin.H{
+					"message": "Invalid access_level value",
+				})
+				return
+			}
+		} else {
+			c.JSON(400, gin.H{
+				"message": "Access level is required",
+			})
+			return
+		}
+
 		// Gọi service với các giá trị limit và offset
-		list, err := service.List(c, &domain.ListOpts{Offset: offset, Limit: limit})
+		list, err := service.List(c, accessLevel, &domain.ListOpts{Offset: offset, Limit: limit})
 		if err != nil {
 			c.JSON(400, gin.H{
 				"message": err.Error(),

@@ -6,11 +6,12 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/ServiceWeaver/weaver"
+	"strconv"
 )
 
 type ProfileService interface {
 	GetById(ctx context.Context, id string) (*domain.Profile, error)
-	List(ctx context.Context, opts *domain.ListOpts) (*domain.ListResult[*domain.Profile], error)
+	List(ctx context.Context, accessLevel int, opts *domain.ListOpts) (*domain.ListResult[*domain.Profile], error)
 	Update(ctx context.Context, profile *domain.Profile) error
 	Delete(ctx context.Context, id string) error
 }
@@ -32,9 +33,9 @@ func (p profileService) GetById(ctx context.Context, id string) (*domain.Profile
 	return profile, nil
 }
 
-func (p profileService) List(ctx context.Context, opts *domain.ListOpts) (*domain.ListResult[*domain.Profile], error) {
+func (p profileService) List(ctx context.Context, accessLevel int, opts *domain.ListOpts) (*domain.ListResult[*domain.Profile], error) {
 	data, count, err := supabase.Client.From("profiles").
-		Select("*", "exact", false).
+		Select("*", "exact", false).Eq("access_level", strconv.Itoa(accessLevel)).
 		Range(opts.Offset, opts.Offset+opts.Limit-1, "").Execute()
 	if err != nil {
 		return nil, err

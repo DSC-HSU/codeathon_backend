@@ -75,13 +75,13 @@ func TestApi(t *testing.T) {
 		w = httptest.NewRecorder()
 		req = httptest.NewRequest("GET", "/profiles", nil)
 		endpoint.GetEngine().ServeHTTP(w, req)
-		if w.Code != 200 {
-			t.Fatalf("GET list profiles expected 200, got %d", w.Code)
+		if w.Code != 400 {
+			t.Fatalf("GET list profiles expected 400, got %d", w.Code)
 		}
 
 		// test list profiles with limit and offset
 		w = httptest.NewRecorder()
-		req = httptest.NewRequest("GET", "/profiles?limit=10&offset=1", nil)
+		req = httptest.NewRequest("GET", "/profiles?accessLevel=0&limit=10&offset=1", nil)
 		endpoint.GetEngine().ServeHTTP(w, req)
 		if w.Code != 200 {
 			t.Fatalf("GET list profiles expected 200, got %d", w.Code)

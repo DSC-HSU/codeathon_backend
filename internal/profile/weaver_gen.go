@@ -95,7 +95,7 @@ func (s profileService_local_stub) GetById(ctx context.Context, a0 string) (r0 *
 	return s.impl.GetById(ctx, a0)
 }
 
-func (s profileService_local_stub) List(ctx context.Context, a0 *domain.ListOpts) (r0 *domain.ListResult[*domain.Profile], err error) {
+func (s profileService_local_stub) List(ctx context.Context, a0 int, a1 *domain.ListOpts) (r0 *domain.ListResult[*domain.Profile], err error) {
 	// Update metrics.
 	begin := s.listMetrics.Begin()
 	defer func() { s.listMetrics.End(begin, err != nil, 0, 0) }()
@@ -112,7 +112,7 @@ func (s profileService_local_stub) List(ctx context.Context, a0 *domain.ListOpts
 		}()
 	}
 
-	return s.impl.List(ctx, a0)
+	return s.impl.List(ctx, a0, a1)
 }
 
 func (s profileService_local_stub) Update(ctx context.Context, a0 *domain.Profile) (err error) {
@@ -259,7 +259,7 @@ func (s profileService_client_stub) GetById(ctx context.Context, a0 string) (r0 
 	return
 }
 
-func (s profileService_client_stub) List(ctx context.Context, a0 *domain.ListOpts) (r0 *domain.ListResult[*domain.Profile], err error) {
+func (s profileService_client_stub) List(ctx context.Context, a0 int, a1 *domain.ListOpts) (r0 *domain.ListResult[*domain.Profile], err error) {
 	// Update metrics.
 	var requestBytes, replyBytes int
 	begin := s.listMetrics.Begin()
@@ -290,7 +290,8 @@ func (s profileService_client_stub) List(ctx context.Context, a0 *domain.ListOpt
 
 	// Encode arguments.
 	enc := codegen.NewEncoder()
-	serviceweaver_enc_ptr_ListOpts_73a4ea72(enc, a0)
+	enc.Int(a0)
+	serviceweaver_enc_ptr_ListOpts_73a4ea72(enc, a1)
 	var shardKey uint64
 
 	// Call the remote method.
@@ -468,13 +469,15 @@ func (s profileService_server_stub) list(ctx context.Context, args []byte) (res 
 
 	// Decode arguments.
 	dec := codegen.NewDecoder(args)
-	var a0 *domain.ListOpts
-	a0 = serviceweaver_dec_ptr_ListOpts_73a4ea72(dec)
+	var a0 int
+	a0 = dec.Int()
+	var a1 *domain.ListOpts
+	a1 = serviceweaver_dec_ptr_ListOpts_73a4ea72(dec)
 
 	// TODO(rgrandl): The deferred function above will recover from panics in the
 	// user code: fix this.
 	// Call the local method.
-	r0, appErr := s.impl.List(ctx, a0)
+	r0, appErr := s.impl.List(ctx, a0, a1)
 
 	// Encode the results.
 	enc := codegen.NewEncoder()
@@ -526,8 +529,8 @@ func (s profileService_reflect_stub) GetById(ctx context.Context, a0 string) (r0
 	return
 }
 
-func (s profileService_reflect_stub) List(ctx context.Context, a0 *domain.ListOpts) (r0 *domain.ListResult[*domain.Profile], err error) {
-	err = s.caller("List", ctx, []any{a0}, []any{&r0})
+func (s profileService_reflect_stub) List(ctx context.Context, a0 int, a1 *domain.ListOpts) (r0 *domain.ListResult[*domain.Profile], err error) {
+	err = s.caller("List", ctx, []any{a0, a1}, []any{&r0})
 	return
 }
 

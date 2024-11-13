@@ -61,7 +61,7 @@ func TestProfileService(t *testing.T) {
 	}
 
 	// test list profiles
-	list, err := service.List(context.Background(), &domain.ListOpts{Offset: 0, Limit: 10})
+	list, err := service.List(context.Background(), 0, &domain.ListOpts{Offset: 0, Limit: 10})
 	if err != nil {
 		t.Fatal(err)
 	}
