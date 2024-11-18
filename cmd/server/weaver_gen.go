@@ -105,3 +105,4 @@ type main_reflect_stub struct {
 
 // Check that main_reflect_stub implements the weaver.Main interface.
 var _ weaver.Main = (*main_reflect_stub)(nil)
+

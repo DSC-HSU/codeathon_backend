@@ -301,7 +301,7 @@ type __is_Submission[T ~struct {
 	UserId        uuid.UUID "json:\"user_id\""
 	OutputFileUrl string    "json:\"output_file_url\""
 	SourceCodeUrl string    "json:\"source_code_url\""
-	InputFileId   int16     "json:\"input_file_id\""
+	InputFileId   string    "json:\"input_file_id\""
 	Score         float64   "json:\"score\""
 	RankScore     float64   "json:\"rank_score\""
 }] struct{}
@@ -317,7 +317,7 @@ func (x *Submission) WeaverMarshal(enc *codegen.Encoder) {
 	enc.EncodeBinaryMarshaler(&x.UserId)
 	enc.String(x.OutputFileUrl)
 	enc.String(x.SourceCodeUrl)
-	enc.Int16(x.InputFileId)
+	enc.String(x.InputFileId)
 	enc.Float64(x.Score)
 	enc.Float64(x.RankScore)
 }
@@ -331,7 +331,7 @@ func (x *Submission) WeaverUnmarshal(dec *codegen.Decoder) {
 	dec.DecodeBinaryUnmarshaler(&x.UserId)
 	x.OutputFileUrl = dec.String()
 	x.SourceCodeUrl = dec.String()
-	x.InputFileId = dec.Int16()
+	x.InputFileId = dec.String()
 	x.Score = dec.Float64()
 	x.RankScore = dec.Float64()
 }
@@ -340,11 +340,11 @@ var _ codegen.AutoMarshal = (*SubmitResult)(nil)
 
 type __is_SubmitResult[T ~struct {
 	weaver.AutoMarshal
-	Id           string    "json:\"id\""
 	ChallengeId  uuid.UUID "json:\"challenge_id\""
 	Score        float64   "json:\"score\""
 	UserId       uuid.UUID "json:\"user_id\""
 	ErrorMessage string    "json:\"error_message\""
+	LogMessage   string    "json:\"log_message\""
 }] struct{}
 
 var _ __is_SubmitResult[SubmitResult]
@@ -353,22 +353,22 @@ func (x *SubmitResult) WeaverMarshal(enc *codegen.Encoder) {
 	if x == nil {
 		panic(fmt.Errorf("SubmitResult.WeaverMarshal: nil receiver"))
 	}
-	enc.String(x.Id)
 	enc.EncodeBinaryMarshaler(&x.ChallengeId)
 	enc.Float64(x.Score)
 	enc.EncodeBinaryMarshaler(&x.UserId)
 	enc.String(x.ErrorMessage)
+	enc.String(x.LogMessage)
 }
 
 func (x *SubmitResult) WeaverUnmarshal(dec *codegen.Decoder) {
 	if x == nil {
 		panic(fmt.Errorf("SubmitResult.WeaverUnmarshal: nil receiver"))
 	}
-	x.Id = dec.String()
 	dec.DecodeBinaryUnmarshaler(&x.ChallengeId)
 	x.Score = dec.Float64()
 	dec.DecodeBinaryUnmarshaler(&x.UserId)
 	x.ErrorMessage = dec.String()
+	x.LogMessage = dec.String()
 }
 
 var _ codegen.AutoMarshal = (*SupabaseConfig)(nil)

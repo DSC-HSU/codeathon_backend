@@ -13,6 +13,7 @@ import (
 	"github.com/google/uuid"
 	v8 "rogchap.com/v8go"
 	"strings"
+	"time"
 )
 
 type ChallengeService interface {
@@ -21,14 +22,32 @@ type ChallengeService interface {
 	List(ctx context.Context, opts *domain.ListOpts) (*domain.ListResult[*domain.Challenge], error)
 	Update(ctx context.Context, challenge *domain.Challenge) error
 	Delete(ctx context.Context, id string) error
-	Scoring(ctx context.Context, submission *domain.Submission) (*domain.SubmitResult, error)
+	Scoring(ctx context.Context, id string) (*domain.SubmitResult, error)
 	UploadEvalScript(ctx context.Context, challengeId string, file []byte) error
 	UploadInputFiles(ctx context.Context, challengeId string, files [][]byte) error
+	GetInputFile(ctx context.Context, challengeId string) ([]byte, error)
+	RunScript(ctx context.Context, file []byte) (*domain.SubmitResult, error)
 }
 
 type challengeService struct {
 	weaver.Implements[ChallengeService]
 	submissionService weaver.Ref[submission.SubmissionService]
+}
+
+func (c challengeService) GetInputFile(ctx context.Context, challengeId string) ([]byte, error) {
+	// Retrieve the existing challenge
+	challenge, err := c.GetById(ctx, challengeId)
+	if err != nil {
+		return nil, err
+	}
+
+	// Get input files from storage
+	inputFile, err := supabase.Client.Storage.DownloadFile("input-files", challenge.InputFileUrls[2])
+	if err != nil {
+		return nil, err
+	}
+
+	return inputFile, nil
 }
 
 func (c challengeService) UploadEvalScript(ctx context.Context, challengeId string, file []byte) error {
@@ -144,15 +163,20 @@ func (c challengeService) Delete(ctx context.Context, id string) error {
 	return err
 }
 
-func (c challengeService) Scoring(ctx context.Context, submission *domain.Submission) (*domain.SubmitResult, error) {
+func (c challengeService) Scoring(ctx context.Context, id string) (*domain.SubmitResult, error) {
+	// get submission by id
+	submissionById, err := c.submissionService.Get().GetById(ctx, id)
+	if err != nil {
+		return nil, err
+	}
 	// Get file  from storage by challengeId
-	challenge, err := c.GetById(ctx, submission.ChallengeId.String())
+	challenge, err := c.GetById(ctx, submissionById.ChallengeId.String())
 	if err != nil {
 		return nil, err
 	}
 
 	// Get eval script from storage
-	file, err := supabase.Client.Storage.DownloadFile("eval-scripts", strings.TrimSpace(challenge.EvalScript))
+	file, err := supabase.Client.Storage.DownloadFile("evel-scripts", strings.Split(challenge.EvalScript, "/evel-scripts/")[1])
 	if err != nil {
 		return nil, err
 	}
@@ -160,7 +184,7 @@ func (c challengeService) Scoring(ctx context.Context, submission *domain.Submis
 
 	// Get input files from storage
 	var input string
-	inputFile, err := supabase.Client.Storage.DownloadFile("input-files", challenge.InputFileUrls[submission.InputFileId])
+	inputFile, err := supabase.Client.Storage.DownloadFile("input-files", strings.Split(submissionById.InputFileId, "/input-files/")[1])
 	if err != nil {
 		return nil, err
 	}
@@ -168,72 +192,228 @@ func (c challengeService) Scoring(ctx context.Context, submission *domain.Submis
 
 	// Get output files from storage
 	var output string
-	outputFile, err := supabase.Client.Storage.DownloadFile("output-files", submission.OutputFileUrl)
+	outputFile, err := supabase.Client.Storage.DownloadFile("output-files", strings.Split(submissionById.OutputFileUrl, "/output-files/")[1])
 	if err != nil {
 		return nil, err
 	}
 	output = string(outputFile)
 
+	ctxWithTimeout, cancel := context.WithTimeout(ctx, 5*time.Minute)
+	defer cancel()
+
 	v8ctx := v8.NewContext() // create a new V8 context
 
-	// Set the `fileContent` variable in JavaScript with the content of `output`
-	_, err = v8ctx.RunScript(fmt.Sprintf("var output = `%s`;", output), "output.js")
-	if err != nil {
-		fmt.Println("Error setting input for JavaScript:", err)
+	resultCh := make(chan *domain.SubmitResult, 1)
+	errorCh := make(chan error, 1)
+
+	go func() {
+		var logs []string
+		var errMess string
+
+		// Override console.log trong JavaScript
+		_, err := v8ctx.RunScript(`
+        var logs = [];
+        console.log = function(message) {
+            logs.push(message);
+        };
+    `, "console_override.js")
+		if err != nil {
+			logs = append(logs, fmt.Sprintf("Failed to override console.log: %v", err))
+			errMess = fmt.Sprintf("Failed to override console.log: %v", err)
+		}
+
+		// Inject input/output
+		if errMess == "" {
+			_, err = v8ctx.RunScript(fmt.Sprintf("const output = `%s`;", output), "output.js")
+			if err != nil {
+				logs = append(logs, fmt.Sprintf("Error injecting output: %v", err))
+				errMess = fmt.Sprintf("Error injecting output: %v", err)
+			}
+		}
+
+		if errMess == "" {
+			_, err = v8ctx.RunScript(fmt.Sprintf("const input = `%s`;", input), "input.js")
+			if err != nil {
+				logs = append(logs, fmt.Sprintf("Error injecting input: %v", err))
+				errMess = fmt.Sprintf("Error injecting input: %v", err)
+			}
+		}
+
+		// Execute script
+		if errMess == "" {
+			_, err = v8ctx.RunScript(data, "submission.js")
+			if err != nil {
+				var e *v8.JSError
+				if errors.As(err, &e) {
+					logs = append(logs, e.Message) // Ghi lỗi từ JavaScript
+					errMess = e.Message
+				} else {
+					logs = append(logs, fmt.Sprintf("%v", err)) // Ghi lỗi chung
+					errMess = fmt.Sprintf("%v", err)
+				}
+			}
+		}
+
+		// Capture logs
+		var jsLogs string
+		if errMess == "" {
+			logResult, err := v8ctx.RunScript("logs.join('\\n');", "logs.js")
+			if err == nil {
+				jsLogs = logResult.String()
+			} else {
+				logs = append(logs, fmt.Sprintf("Failed to capture logs: %v", err))
+				errMess = fmt.Sprintf("Failed to capture logs: %v", err)
+			}
+		}
+
+		// Get score
+		var score float64
+		if errMess == "" {
+			val, err := v8ctx.RunScript("score", "result.js")
+			if err == nil {
+				score = val.Number()
+				if score < 0 {
+					logs = append(logs, "Score cannot be negative.")
+					errMess = "Score cannot be negative."
+				}
+			} else {
+				var e *v8.JSError
+				if errors.As(err, &e) {
+					logs = append(logs, e.Message)
+					errMess = e.Message
+				} else {
+					logs = append(logs, fmt.Sprintf("%v", err))
+					errMess = fmt.Sprintf("%v", err)
+				}
+			}
+		}
+
+		// Tạo kết quả
+		result := &domain.SubmitResult{
+			Score:        score,
+			UserId:       submissionById.UserId,
+			ChallengeId:  submissionById.ChallengeId,
+			ErrorMessage: errMess, // Gắn lỗi gốc
+			LogMessage:   jsLogs,  // Log từ JavaScript
+		}
+
+		resultCh <- result
+	}()
+
+	select {
+	case <-ctxWithTimeout.Done():
+		// If the context times out, return a timeout error
+		return nil, errors.New("run out of time execution")
+	case err := <-errorCh:
+		// If an error occurs in the goroutine, return the error
 		return nil, err
+	case result := <-resultCh:
+		// Cập nhật điểm nếu không có lỗi
+		if result.ErrorMessage == "" {
+			submissionById.Score = result.Score
+			err = c.submissionService.Get().Update(ctx, submissionById)
+			if err != nil {
+				return nil, err
+			}
+		}
+		// Trả về kết quả (có thể có lỗi trong ErrorMessage)
+		return result, nil
 	}
+}
 
-	// Set the `fileContent` variable in JavaScript with the content of `input`
-	_, err = v8ctx.RunScript(fmt.Sprintf("var input = `%s`;", input), "input.js")
-	if err != nil {
-		fmt.Println("Error setting input for JavaScript:", err)
+func (c challengeService) RunScript(ctx context.Context, file []byte) (*domain.SubmitResult, error) {
+	ctxWithTimeout, cancel := context.WithTimeout(ctx, 5*time.Minute)
+	defer cancel()
+
+	v8ctx := v8.NewContext() // create a new V8 context
+
+	resultCh := make(chan *domain.SubmitResult, 1)
+	errorCh := make(chan error, 1)
+
+	go func() {
+		var logs []string
+		var errMess string
+
+		// Override console.log trong JavaScript
+		_, err := v8ctx.RunScript(`
+		var logs = [];
+		console.log = function(message) {
+			logs.push(message);
+		};
+	`, "console_override.js")
+		if err != nil {
+			logs = append(logs, fmt.Sprintf("Failed to override console.log: %v", err))
+			errMess = fmt.Sprintf("Failed to override console.log: %v", err)
+		}
+
+		// Execute script
+		if errMess == "" {
+			_, err = v8ctx.RunScript(string(file), "submission.js")
+			if err != nil {
+				var e *v8.JSError
+				if errors.As(err, &e) {
+					logs = append(logs, e.Message) // Ghi lỗi từ JavaScript
+					errMess = e.Message
+				} else {
+					logs = append(logs, fmt.Sprintf("%v", err)) // Ghi lỗi chung
+					errMess = fmt.Sprintf("%v", err)
+				}
+			}
+		}
+
+		// Capture logs
+		var jsLogs string
+		if errMess == "" {
+			logResult, err := v8ctx.RunScript("logs.join('\\n');", "logs.js")
+			if err == nil {
+				jsLogs = logResult.String()
+			} else {
+				logs = append(logs, fmt.Sprintf("Failed to capture logs: %v", err))
+				errMess = fmt.Sprintf("Failed to capture logs: %v", err)
+			}
+		}
+
+		// Get score
+		var score float64
+		if errMess == "" {
+			val, err := v8ctx.RunScript("score", "result.js")
+			if err == nil {
+				score = val.Number()
+				if score < 0 {
+					logs = append(logs, "Score cannot be negative.")
+					errMess = "Score cannot be negative."
+				}
+			} else {
+				var e *v8.JSError
+				if errors.As(err, &e) {
+					logs = append(logs, e.Message)
+					errMess = e.Message
+				} else {
+					logs = append(logs, fmt.Sprintf("%v", err))
+					errMess = fmt.Sprintf("%v", err)
+				}
+			}
+		}
+
+		// Tạo kết quả
+		result := &domain.SubmitResult{
+			Score:        score,
+			ErrorMessage: errMess, // Gắn lỗi gốc
+			LogMessage:   jsLogs,  // Log từ JavaScript
+		}
+
+		resultCh <- result
+	}()
+
+	select {
+	case <-ctxWithTimeout.Done():
+		// If the context times out, return a timeout error
+		return nil, errors.New("run out of time execution")
+	case err := <-errorCh:
+		// If an error occurs in the goroutine, return the error
 		return nil, err
+	case result := <-resultCh:
+		// Trả về kết quả (có thể có lỗi trong ErrorMessage)
+		return result, nil
 	}
-
-	// Chạy script JavaScript với dữ liệu `data`
-	_, err = v8ctx.RunScript(data, "submission.js")
-	errMess := ""
-	if err != nil {
-		var e *v8.JSError
-		errors.As(err, &e)        // xử lý lỗi JavaScript
-		fmt.Println(e.Message)    // in thông báo lỗi
-		fmt.Println(e.Location)   // in vị trí lỗi
-		fmt.Println(e.StackTrace) // in stack trace
-
-		fmt.Printf("javascript error: %v", e)
-		fmt.Printf("javascript stack trace: %+v", e)
-		errMess = e.Message
-	}
-
-	// Lấy kết quả tính điểm từ biến `score` trong JavaScript
-	val, err := v8ctx.RunScript("score", "result.js")
-	if err != nil {
-		return nil, err
-	}
-
-	// Chuyển đổi kết quả `score` sang kiểu số thực (float64)
-	score := val.Number()
-
-	if score < 0 {
-		return nil, errors.New("score must be greater than or equal to 0")
-	}
-
-	// Trả về kết quả dưới dạng `SubmitResult`
-	result := &domain.SubmitResult{
-		Score:        score,
-		UserId:       submission.UserId,
-		ChallengeId:  submission.ChallengeId,
-		ErrorMessage: errMess,
-	}
-
-	// Cập nhật điểm cho submission hiện tại
-	submission.Score = result.Score
-
-	err = c.submissionService.Get().Update(ctx, submission)
-	if err != nil {
-		return nil, err
-	}
-
-	// Trả về kết quả sau khi hoàn thành
-	return result, nil
 }

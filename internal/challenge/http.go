@@ -154,10 +154,11 @@ func Api(service ChallengeService) {
 		})
 	})
 
-	r.POST("/challenge/scoring", func(c *gin.Context) {
-		// Get the submission data as a JSON string from body
-		submission := &domain.Submission{}
-		err := c.BindJSON(submission)
+	r.POST("/challenge/scoring/:id", func(c *gin.Context) {
+		id := c.Param("id")
+
+		// Call the scoring function with the submission and the script content
+		result, err := service.Scoring(c, id)
 		if err != nil {
 			c.JSON(400, gin.H{
 				"message": err.Error(),
@@ -165,8 +166,42 @@ func Api(service ChallengeService) {
 			return
 		}
 
+		// Return the result as a JSON response
+		c.JSON(200, result)
+	})
+
+	// run script
+	r.POST("/challenge/run-script", func(c *gin.Context) {
+		// receive the script file
+		file, err := c.FormFile("script")
+		if err != nil {
+			c.JSON(400, gin.H{
+				"message": "Failed to retrieve file: " + err.Error(),
+			})
+			return
+		}
+
+		// Open the uploaded file
+		fileContent, err := file.Open()
+		if err != nil {
+			c.JSON(400, gin.H{
+				"message": "Failed to open file: " + err.Error(),
+			})
+			return
+		}
+
+		// Read the content of the file into a byte slice
+		fileBytes, err := io.ReadAll(fileContent)
+		if err != nil {
+			c.JSON(400, gin.H{
+				"message": "Failed to read file: " + err.Error(),
+			})
+			return
+		}
+
 		// Call the scoring function with the submission and the script content
-		result, err := service.Scoring(c, submission)
+		result, err := service.RunScript(c, fileBytes)
+
 		if err != nil {
 			c.JSON(400, gin.H{
 				"message": err.Error(),
