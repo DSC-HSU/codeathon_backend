@@ -27,6 +27,8 @@ func TestProfileService(t *testing.T) {
 
 	supabase.Init()
 
+
+
 	// create default account
 	err = security.CreateDefaultAccount(true)
 	if err != nil {
