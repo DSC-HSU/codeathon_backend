@@ -28,3 +28,6 @@ load-dev-data:
 dev-stop:
 	supabase stop
 
+dev-start-config:
+	weaver generate ./...
+	SERVICEWEAVER_CONFIG=weaver.toml go run ./cmd/server
