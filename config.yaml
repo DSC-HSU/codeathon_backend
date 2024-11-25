@@ -1,3 +1,7 @@
 appConfig: weaver.toml
-repo: docker.io/ambrosentk
+repo: docker.io/vominhtri1610
 namespace: codeathon
+
+listeners:
+  - name: server
+    public: true

@@ -2,7 +2,7 @@
 # application:
 #
 #     app: server
-#     version: ad2c0e6e
+#     version: ce77cf42
 #     components groups:
 #     - 
 #       - codeathon.runwayclub.dev/internal/challenge/ChallengeService
@@ -26,19 +26,19 @@
 #
 # To deploy these resources, run:
 #
-#     kubectl apply -f /var/folders/z1/hk2ljcn16sbf9vwbqjwp0fsm0000gn/T/kube_ad2c0e6e.yaml
+#     kubectl apply -f /tmp/kube_ce77cf42.yaml
 #
 # To view the deployed resources, run:
 #
-#     kubectl get all,configmaps --selector=serviceweaver/version=ad2c0e6e
+#     kubectl get all,configmaps --selector=serviceweaver/version=ce77cf42
 #
 # To view a description of every resource, run:
 #
-#     kubectl get all,configmaps --selector=serviceweaver/version=ad2c0e6e -o custom-columns=KIND:.kind,NAME:.metadata.name,APP:.metadata.labels.serviceweaver/app,VERSION:.metadata.labels.serviceweaver/version,DESCRIPTION:.metadata.annotations.description
+#     kubectl get all,configmaps --selector=serviceweaver/version=ce77cf42 -o custom-columns=KIND:.kind,NAME:.metadata.name,APP:.metadata.labels.serviceweaver/app,VERSION:.metadata.labels.serviceweaver/version,DESCRIPTION:.metadata.annotations.description
 #
 # To delete the resources, run:
 #
-#     kubectl delete all,configmaps --selector=serviceweaver/version=ad2c0e6e
+#     kubectl delete all,configmaps --selector=serviceweaver/version=ce77cf42
 
 
 # Roles.
@@ -82,36 +82,36 @@ subjects:
 apiVersion: v1
 data:
   config.textpb: |
-    namespace: "codeathon"
-    deployment_id: "ad2c0e6e-eb2b-4b6e-a3cb-33c26eca4498"
-    listeners: {
-      key: "server"
-      value: 20000
+    namespace:  "codeathon"
+    deployment_id:  "ce77cf42-9852-4c18-85c4-4db12f5f9bb5"
+    listeners:  {
+      key:  "server"
+      value:  20000
     }
-    groups: {
-      key: "codeathon.runwayclub.dev/internal/challenge/ChallengeService"
-      value: "codeathon.runwayclub.dev/internal/challenge/ChallengeService"
+    groups:  {
+      key:  "codeathon.runwayclub.dev/internal/challenge/ChallengeService"
+      value:  "codeathon.runwayclub.dev/internal/challenge/ChallengeService"
     }
-    groups: {
-      key: "codeathon.runwayclub.dev/internal/leaderboard/LeaderboardService"
-      value: "codeathon.runwayclub.dev/internal/leaderboard/LeaderboardService"
+    groups:  {
+      key:  "codeathon.runwayclub.dev/internal/leaderboard/LeaderboardService"
+      value:  "codeathon.runwayclub.dev/internal/leaderboard/LeaderboardService"
     }
-    groups: {
-      key: "codeathon.runwayclub.dev/internal/profile/ProfileService"
-      value: "codeathon.runwayclub.dev/internal/profile/ProfileService"
+    groups:  {
+      key:  "codeathon.runwayclub.dev/internal/profile/ProfileService"
+      value:  "codeathon.runwayclub.dev/internal/profile/ProfileService"
     }
-    groups: {
-      key: "codeathon.runwayclub.dev/internal/submission/SubmissionService"
-      value: "codeathon.runwayclub.dev/internal/submission/SubmissionService"
+    groups:  {
+      key:  "codeathon.runwayclub.dev/internal/submission/SubmissionService"
+      value:  "codeathon.runwayclub.dev/internal/submission/SubmissionService"
     }
-    groups: {
-      key: "github.com/ServiceWeaver/weaver/Main"
-      value: "github.com/ServiceWeaver/weaver/Main"
+    groups:  {
+      key:  "github.com/ServiceWeaver/weaver/Main"
+      value:  "github.com/ServiceWeaver/weaver/Main"
     }
-    telemetry: {
-      metrics: {
-        export_interval: {
-          seconds: 30
+    telemetry:  {
+      metrics:  {
+        export_interval:  {
+          seconds:  30
         }
       }
     }
@@ -130,12 +130,12 @@ data:
 kind: ConfigMap
 metadata:
   annotations:
-    description: This ConfigMap contains config files for app "server" version "ad2c0e6e".
+    description: This ConfigMap contains config files for app "server" version "ce77cf42".
   creationTimestamp: null
   labels:
     serviceweaver/app: server
-    serviceweaver/version: ad2c0e6e
-  name: config-ad2c0e6e
+    serviceweaver/version: ce77cf42
+  name: config-ce77cf42
   namespace: codeathon
 
 ---
@@ -149,13 +149,13 @@ metadata:
   creationTimestamp: null
   labels:
     serviceweaver/app: server
-    serviceweaver/version: ad2c0e6e
-  name: server-challenge-challengeservice-ad2c0e6e-6fd3965b
+    serviceweaver/version: ce77cf42
+  name: server-challenge-challengeservice-ce77cf42-25266546
   namespace: codeathon
 spec:
   selector:
     matchLabels:
-      serviceweaver/name: server-challenge-challengeservice-ad2c0e6e-6fd3965b
+      serviceweaver/name: server-challenge-challengeservice-ce77cf42-25266546
   strategy: {}
   template:
     metadata:
@@ -164,8 +164,8 @@ spec:
       creationTimestamp: null
       labels:
         serviceweaver/app: server
-        serviceweaver/name: server-challenge-challengeservice-ad2c0e6e-6fd3965b
-        serviceweaver/version: ad2c0e6e
+        serviceweaver/name: server-challenge-challengeservice-ce77cf42-25266546
+        serviceweaver/version: ce77cf42
       namespace: codeathon
     spec:
       affinity:
@@ -174,7 +174,7 @@ spec:
           - podAffinityTerm:
               labelSelector:
                 matchLabels:
-                  serviceweaver/name: server-challenge-challengeservice-ad2c0e6e-6fd3965b
+                  serviceweaver/name: server-challenge-challengeservice-ce77cf42-25266546
               topologyKey: kubernetes.io/hostname
             weight: 100
       containers:
@@ -183,7 +183,7 @@ spec:
         - /weaver/weaver.toml
         - /weaver/config.textpb
         - codeathon.runwayclub.dev/internal/challenge/ChallengeService
-        image: docker.io/ambrosentk/server:ad2c0e6e
+        image: docker.io/vominhtri1610/server:ce77cf42
         imagePullPolicy: IfNotPresent
         name: serviceweaver
         resources: {}
@@ -200,7 +200,7 @@ spec:
       serviceAccountName: default
       volumes:
       - configMap:
-          name: config-ad2c0e6e
+          name: config-ce77cf42
         name: config
 status: {}
 
@@ -211,13 +211,13 @@ apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   annotations:
-    description: This HorizontalPodAutoscaler scales the "server-challenge-challengeservice-ad2c0e6e-6fd3965b"
+    description: This HorizontalPodAutoscaler scales the "server-challenge-challengeservice-ce77cf42-25266546"
       Deployment.
   creationTimestamp: null
   labels:
     serviceweaver/app: server
-    serviceweaver/version: ad2c0e6e
-  name: server-challenge-challengeservice-ad2c0e6e-6fd3965b
+    serviceweaver/version: ce77cf42
+  name: server-challenge-challengeservice-ce77cf42-25266546
   namespace: codeathon
 spec:
   maxReplicas: 10
@@ -232,7 +232,7 @@ spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: server-challenge-challengeservice-ad2c0e6e-6fd3965b
+    name: server-challenge-challengeservice-ce77cf42-25266546
 status:
   currentMetrics: null
   desiredReplicas: 0
@@ -248,13 +248,13 @@ metadata:
   creationTimestamp: null
   labels:
     serviceweaver/app: server
-    serviceweaver/version: ad2c0e6e
-  name: server-leaderboard-leaderboardservice-ad2c0e6e-5551eb62
+    serviceweaver/version: ce77cf42
+  name: server-leaderboard-leaderboardservice-ce77cf42-e42dcf73
   namespace: codeathon
 spec:
   selector:
     matchLabels:
-      serviceweaver/name: server-leaderboard-leaderboardservice-ad2c0e6e-5551eb62
+      serviceweaver/name: server-leaderboard-leaderboardservice-ce77cf42-e42dcf73
   strategy: {}
   template:
     metadata:
@@ -263,8 +263,8 @@ spec:
       creationTimestamp: null
       labels:
         serviceweaver/app: server
-        serviceweaver/name: server-leaderboard-leaderboardservice-ad2c0e6e-5551eb62
-        serviceweaver/version: ad2c0e6e
+        serviceweaver/name: server-leaderboard-leaderboardservice-ce77cf42-e42dcf73
+        serviceweaver/version: ce77cf42
       namespace: codeathon
     spec:
       affinity:
@@ -273,7 +273,7 @@ spec:
           - podAffinityTerm:
               labelSelector:
                 matchLabels:
-                  serviceweaver/name: server-leaderboard-leaderboardservice-ad2c0e6e-5551eb62
+                  serviceweaver/name: server-leaderboard-leaderboardservice-ce77cf42-e42dcf73
               topologyKey: kubernetes.io/hostname
             weight: 100
       containers:
@@ -282,7 +282,7 @@ spec:
         - /weaver/weaver.toml
         - /weaver/config.textpb
         - codeathon.runwayclub.dev/internal/leaderboard/LeaderboardService
-        image: docker.io/ambrosentk/server:ad2c0e6e
+        image: docker.io/vominhtri1610/server:ce77cf42
         imagePullPolicy: IfNotPresent
         name: serviceweaver
         resources: {}
@@ -299,7 +299,7 @@ spec:
       serviceAccountName: default
       volumes:
       - configMap:
-          name: config-ad2c0e6e
+          name: config-ce77cf42
         name: config
 status: {}
 
@@ -310,13 +310,13 @@ apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   annotations:
-    description: This HorizontalPodAutoscaler scales the "server-leaderboard-leaderboardservice-ad2c0e6e-5551eb62"
+    description: This HorizontalPodAutoscaler scales the "server-leaderboard-leaderboardservice-ce77cf42-e42dcf73"
       Deployment.
   creationTimestamp: null
   labels:
     serviceweaver/app: server
-    serviceweaver/version: ad2c0e6e
-  name: server-leaderboard-leaderboardservice-ad2c0e6e-5551eb62
+    serviceweaver/version: ce77cf42
+  name: server-leaderboard-leaderboardservice-ce77cf42-e42dcf73
   namespace: codeathon
 spec:
   maxReplicas: 10
@@ -331,7 +331,7 @@ spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: server-leaderboard-leaderboardservice-ad2c0e6e-5551eb62
+    name: server-leaderboard-leaderboardservice-ce77cf42-e42dcf73
 status:
   currentMetrics: null
   desiredReplicas: 0
@@ -347,13 +347,13 @@ metadata:
   creationTimestamp: null
   labels:
     serviceweaver/app: server
-    serviceweaver/version: ad2c0e6e
-  name: server-profile-profileservice-ad2c0e6e-cb3d3d02
+    serviceweaver/version: ce77cf42
+  name: server-profile-profileservice-ce77cf42-96643323
   namespace: codeathon
 spec:
   selector:
     matchLabels:
-      serviceweaver/name: server-profile-profileservice-ad2c0e6e-cb3d3d02
+      serviceweaver/name: server-profile-profileservice-ce77cf42-96643323
   strategy: {}
   template:
     metadata:
@@ -362,8 +362,8 @@ spec:
       creationTimestamp: null
       labels:
         serviceweaver/app: server
-        serviceweaver/name: server-profile-profileservice-ad2c0e6e-cb3d3d02
-        serviceweaver/version: ad2c0e6e
+        serviceweaver/name: server-profile-profileservice-ce77cf42-96643323
+        serviceweaver/version: ce77cf42
       namespace: codeathon
     spec:
       affinity:
@@ -372,7 +372,7 @@ spec:
           - podAffinityTerm:
               labelSelector:
                 matchLabels:
-                  serviceweaver/name: server-profile-profileservice-ad2c0e6e-cb3d3d02
+                  serviceweaver/name: server-profile-profileservice-ce77cf42-96643323
               topologyKey: kubernetes.io/hostname
             weight: 100
       containers:
@@ -381,7 +381,7 @@ spec:
         - /weaver/weaver.toml
         - /weaver/config.textpb
         - codeathon.runwayclub.dev/internal/profile/ProfileService
-        image: docker.io/ambrosentk/server:ad2c0e6e
+        image: docker.io/vominhtri1610/server:ce77cf42
         imagePullPolicy: IfNotPresent
         name: serviceweaver
         resources: {}
@@ -398,7 +398,7 @@ spec:
       serviceAccountName: default
       volumes:
       - configMap:
-          name: config-ad2c0e6e
+          name: config-ce77cf42
         name: config
 status: {}
 
@@ -409,13 +409,13 @@ apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   annotations:
-    description: This HorizontalPodAutoscaler scales the "server-profile-profileservice-ad2c0e6e-cb3d3d02"
+    description: This HorizontalPodAutoscaler scales the "server-profile-profileservice-ce77cf42-96643323"
       Deployment.
   creationTimestamp: null
   labels:
     serviceweaver/app: server
-    serviceweaver/version: ad2c0e6e
-  name: server-profile-profileservice-ad2c0e6e-cb3d3d02
+    serviceweaver/version: ce77cf42
+  name: server-profile-profileservice-ce77cf42-96643323
   namespace: codeathon
 spec:
   maxReplicas: 10
@@ -430,7 +430,7 @@ spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: server-profile-profileservice-ad2c0e6e-cb3d3d02
+    name: server-profile-profileservice-ce77cf42-96643323
 status:
   currentMetrics: null
   desiredReplicas: 0
@@ -446,13 +446,13 @@ metadata:
   creationTimestamp: null
   labels:
     serviceweaver/app: server
-    serviceweaver/version: ad2c0e6e
-  name: server-submission-submissionservice-ad2c0e6e-a77f7e37
+    serviceweaver/version: ce77cf42
+  name: server-submission-submissionservice-ce77cf42-8f8800f7
   namespace: codeathon
 spec:
   selector:
     matchLabels:
-      serviceweaver/name: server-submission-submissionservice-ad2c0e6e-a77f7e37
+      serviceweaver/name: server-submission-submissionservice-ce77cf42-8f8800f7
   strategy: {}
   template:
     metadata:
@@ -461,8 +461,8 @@ spec:
       creationTimestamp: null
       labels:
         serviceweaver/app: server
-        serviceweaver/name: server-submission-submissionservice-ad2c0e6e-a77f7e37
-        serviceweaver/version: ad2c0e6e
+        serviceweaver/name: server-submission-submissionservice-ce77cf42-8f8800f7
+        serviceweaver/version: ce77cf42
       namespace: codeathon
     spec:
       affinity:
@@ -471,7 +471,7 @@ spec:
           - podAffinityTerm:
               labelSelector:
                 matchLabels:
-                  serviceweaver/name: server-submission-submissionservice-ad2c0e6e-a77f7e37
+                  serviceweaver/name: server-submission-submissionservice-ce77cf42-8f8800f7
               topologyKey: kubernetes.io/hostname
             weight: 100
       containers:
@@ -480,7 +480,7 @@ spec:
         - /weaver/weaver.toml
         - /weaver/config.textpb
         - codeathon.runwayclub.dev/internal/submission/SubmissionService
-        image: docker.io/ambrosentk/server:ad2c0e6e
+        image: docker.io/vominhtri1610/server:ce77cf42
         imagePullPolicy: IfNotPresent
         name: serviceweaver
         resources: {}
@@ -497,7 +497,7 @@ spec:
       serviceAccountName: default
       volumes:
       - configMap:
-          name: config-ad2c0e6e
+          name: config-ce77cf42
         name: config
 status: {}
 
@@ -508,13 +508,13 @@ apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   annotations:
-    description: This HorizontalPodAutoscaler scales the "server-submission-submissionservice-ad2c0e6e-a77f7e37"
+    description: This HorizontalPodAutoscaler scales the "server-submission-submissionservice-ce77cf42-8f8800f7"
       Deployment.
   creationTimestamp: null
   labels:
     serviceweaver/app: server
-    serviceweaver/version: ad2c0e6e
-  name: server-submission-submissionservice-ad2c0e6e-a77f7e37
+    serviceweaver/version: ce77cf42
+  name: server-submission-submissionservice-ce77cf42-8f8800f7
   namespace: codeathon
 spec:
   maxReplicas: 10
@@ -529,7 +529,7 @@ spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: server-submission-submissionservice-ad2c0e6e-a77f7e37
+    name: server-submission-submissionservice-ce77cf42-8f8800f7
 status:
   currentMetrics: null
   desiredReplicas: 0
@@ -546,8 +546,8 @@ metadata:
   labels:
     serviceweaver/app: server
     serviceweaver/listener: server
-    serviceweaver/version: ad2c0e6e
-  name: server-ad2c0e6e
+    serviceweaver/version: ce77cf42
+  name: server-ce77cf42
   namespace: codeathon
 spec:
   ports:
@@ -555,8 +555,8 @@ spec:
     protocol: TCP
     targetPort: 20000
   selector:
-    serviceweaver/name: server-weaver-main-ad2c0e6e-1aba0fde
-  type: ClusterIP
+    serviceweaver/name: server-weaver-main-ce77cf42-4d83b67f
+  type: LoadBalancer
 status:
   loadBalancer: {}
 
@@ -571,13 +571,13 @@ metadata:
   creationTimestamp: null
   labels:
     serviceweaver/app: server
-    serviceweaver/version: ad2c0e6e
-  name: server-weaver-main-ad2c0e6e-1aba0fde
+    serviceweaver/version: ce77cf42
+  name: server-weaver-main-ce77cf42-4d83b67f
   namespace: codeathon
 spec:
   selector:
     matchLabels:
-      serviceweaver/name: server-weaver-main-ad2c0e6e-1aba0fde
+      serviceweaver/name: server-weaver-main-ce77cf42-4d83b67f
   strategy: {}
   template:
     metadata:
@@ -586,8 +586,8 @@ spec:
       creationTimestamp: null
       labels:
         serviceweaver/app: server
-        serviceweaver/name: server-weaver-main-ad2c0e6e-1aba0fde
-        serviceweaver/version: ad2c0e6e
+        serviceweaver/name: server-weaver-main-ce77cf42-4d83b67f
+        serviceweaver/version: ce77cf42
       namespace: codeathon
     spec:
       affinity:
@@ -596,7 +596,7 @@ spec:
           - podAffinityTerm:
               labelSelector:
                 matchLabels:
-                  serviceweaver/name: server-weaver-main-ad2c0e6e-1aba0fde
+                  serviceweaver/name: server-weaver-main-ce77cf42-4d83b67f
               topologyKey: kubernetes.io/hostname
             weight: 100
       containers:
@@ -605,7 +605,7 @@ spec:
         - /weaver/weaver.toml
         - /weaver/config.textpb
         - github.com/ServiceWeaver/weaver/Main
-        image: docker.io/ambrosentk/server:ad2c0e6e
+        image: docker.io/vominhtri1610/server:ce77cf42
         imagePullPolicy: IfNotPresent
         name: serviceweaver
         ports:
@@ -625,7 +625,7 @@ spec:
       serviceAccountName: default
       volumes:
       - configMap:
-          name: config-ad2c0e6e
+          name: config-ce77cf42
         name: config
 status: {}
 
@@ -636,13 +636,13 @@ apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   annotations:
-    description: This HorizontalPodAutoscaler scales the "server-weaver-main-ad2c0e6e-1aba0fde"
+    description: This HorizontalPodAutoscaler scales the "server-weaver-main-ce77cf42-4d83b67f"
       Deployment.
   creationTimestamp: null
   labels:
     serviceweaver/app: server
-    serviceweaver/version: ad2c0e6e
-  name: server-weaver-main-ad2c0e6e-1aba0fde
+    serviceweaver/version: ce77cf42
+  name: server-weaver-main-ce77cf42-4d83b67f
   namespace: codeathon
 spec:
   maxReplicas: 10
@@ -657,7 +657,7 @@ spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: server-weaver-main-ad2c0e6e-1aba0fde
+    name: server-weaver-main-ce77cf42-4d83b67f
 status:
   currentMetrics: null
   desiredReplicas: 0

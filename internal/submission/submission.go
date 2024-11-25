@@ -109,6 +109,7 @@ func (s submissionService) Create(ctx context.Context, submission *domain.Submis
 }
 
 func (s submissionService) Update(ctx context.Context, submission *domain.Submission) error {
-	_, _, err := supabase.Client.From("submissions").Update(submission, "", "").Eq("challenge_id", submission.ChallengeId.String()).Eq("user_id", submission.UserId.String()).Execute()
+	fmt.Println(submission)
+	_, _, err := supabase.Client.From("submissions").Update(submission, "", "").Eq("challenge_id", submission.ChallengeId.String()).Eq("user_id", submission.UserId.String()).Eq("id", submission.Id.String()).Execute()
 	return err
 }

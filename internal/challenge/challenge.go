@@ -311,6 +311,7 @@ func (c challengeService) Scoring(ctx context.Context, id string) (*domain.Submi
 		// Cập nhật điểm nếu không có lỗi
 		if result.ErrorMessage == "" {
 			submissionById.Score = result.Score
+
 			err = c.submissionService.Get().Update(ctx, submissionById)
 			if err != nil {
 				return nil, err
